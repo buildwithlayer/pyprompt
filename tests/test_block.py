@@ -1,5 +1,5 @@
 import pytest
-from blocks import Block, StrictBlock
+from block import Block, StrictBlock
 
 def test_block_pass():
     block = Block(name="user_input", data="bbb", to_text=str)
@@ -8,7 +8,7 @@ def test_block_pass():
     assert block.to_text == str
 
 def test_block_fail():
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         Block(name=None, data="bbb", to_text=str)
 
 def test_block_reduce():
@@ -30,5 +30,5 @@ def test_strict_block_pass():
     assert block.to_text == str
 
 def test_strict_block_fail():
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         StrictBlock(name=None, data="bbb", to_text=str)

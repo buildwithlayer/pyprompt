@@ -1,51 +1,13 @@
 import pytest
-import timeit
+import logging
 from token_distribution import *
-from blocks import Block
+from block import Block
 
-def time():
-    """
-    An example demonstrating how to use this module.
-    """
-    encoding_name = "cl100k_base"
-    tokenize = tiktoken.get_encoding(encoding_name).encode
-    blocks = [
-        Block(name='system_prompt', data='a '*1000, to_text=str),
-        Block(name='user_input', data='b ' * 1000, to_text=str),
-        Block(name='chat_history', data='c '* 1000, to_text=str),
-        Block(name='actions', data='d '* 1000, to_text=str),
-    ]
-    arbitrator = Arbitrator(
-        arbitration_functions=[
-            ArbitrationFunction({'system_prompt'}, reduce_blocks_simple),
-            ArbitrationFunction({'user_input'}, reduce_blocks_simple),
-            ArbitrationFunction({'chat_history'}, reduce_blocks_simple),
-            ArbitrationFunction({'actions'}, reduce_blocks_simple),
-        ],
-        default_function=reduce_blocks_simple
-    )
-    tokens_remaining, result_blocks = arbitrator.distribute_tokens(
-        tokenize=tokenize,
-        blocks=blocks,
-        max_tokens=3000,
-    )
-
-    print(f'There are {tokens_remaining} tokens remaining.')
-
-    for block in result_blocks:
-        print(str(block))
-
-    time = timeit.timeit(
-    lambda: arbitrator.distribute_tokens(
-        tokenize=tokenize,
-        blocks=blocks,
-        max_tokens=10,
-    ), number=100)
-
-    print(f'Time: {time}')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def make_blocks_helper(*args):
-    return [Block(name=i, data=d, to_text=f) for (i, (d, f)) in enumerate(args)]
+    return [Block(name=str(i), data=d, to_text=f) for (i, (d, f)) in enumerate(args)]
 
 @pytest.fixture
 def my_blocks():
@@ -57,7 +19,7 @@ def my_arbitrator():
     arbitration_functions=[
         ArbitrationFunction({'system_prompt'}, reduce_blocks_simple),
         ArbitrationFunction({'user_input'}, reduce_blocks_simple),
-        ArbitrationFunction({'chat_history'}, reduce_blocks_simple),
+        ArbitrationFunction({'chat_history'}, reduce_blocks_simple),    
         ArbitrationFunction({'actions'}, reduce_blocks_simple),
     ],
     default_function=reduce_blocks_simple
@@ -70,7 +32,7 @@ def assert_block_lists_equal(blocks1, blocks2):
     for b1, b2 in zip(blocks1, blocks2):
         result = are_blocks_equal(b1, b2)
         if not result:
-            print(f'Assertion failed: {b1.name}, length {len(b1.data)}: {b1.data} != {b2.name}, length {len(b2.data)}: {b2.data}')
+            logger.warning(f'Assertion failed: {b1.name}, length {len(b1.data)}: {b1.data} != {b2.name}, length {len(b2.data)}: {b2.data}')
         assert result
 
 def my_tokenizer(s):

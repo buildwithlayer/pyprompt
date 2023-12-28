@@ -6,6 +6,6 @@ Note that the tokenizer used here may not be exactly the same as the one used by
 
 The required packages can be installed by running `poetry install`.
 
-For direction on how to use this module, please see function `example` in `promptval/prompt_validation.py` and read the appropriate docstrings as necessary.
+For direction on how to use this module, please see function `example` in `pyprompt/prompt_validation.py` and read the appropriate docstrings as necessary.
 
 The test suite can be run using `poetry run pytest`.

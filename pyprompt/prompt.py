@@ -1,6 +1,7 @@
 import tiktoken
+import logging
 from token_distribution import example_arbitrator
-from blocks import example_blocks
+from pyprompt.block import example_blocks
 
 class Prompt:
     """
@@ -10,8 +11,10 @@ class Prompt:
 
     def _validate(self):
         """Validates the prompt."""
-        assert self.blocks is not None
-        assert self.arbitrator is not None
+        if self.blocks is None:
+            raise TypeError("Blocks cannot be None.")
+        if self.arbitrator is None:
+            raise TypeError("Arbitrator cannot be None.")
 
     def _distribute_tokens(self):
         """Distributes tokens amongst the blocks in this prompt."""
@@ -22,11 +25,6 @@ class Prompt:
         )
 
         self.tokens_used = self.max_tokens - tokens_remaining
-
-        # TODO: turn the below into log statements
-        print(f"There are {tokens_remaining} tokens remaining.")
-        for block in self.blocks:
-            print(str(block))
 
     def __init__(self, blocks, arbitrator, tokenize, max_tokens):
         """
@@ -39,10 +37,6 @@ class Prompt:
         self.blocks = blocks
         self.arbitrator = arbitrator
         self.max_tokens = max_tokens
-        print(f"Max tokens: {self.max_tokens}")
-        print('hello')
-        print('world')
-        print('how are you')
         self.tokenize = tokenize
 
         self._distribute_tokens()
@@ -64,4 +58,5 @@ def example():
     )
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     example()

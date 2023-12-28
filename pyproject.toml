@@ -1,10 +1,10 @@
 [tool.pytest.ini_options]
 pythonpath = [
-  "promptval"
+  "pyprompt"
 ]
 
 [tool.poetry]
-name = "promptval"
+name = "pyprompt"
 version = "0.1.0"
 description = "Validation for LLM prompts."
 authors = ["Chris Vincens <chrisv@buildwithlayer.com>"]

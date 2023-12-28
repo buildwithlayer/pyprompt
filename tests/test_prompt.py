@@ -1,5 +1,5 @@
 from test_utilities import *
-from prompt_validation import Prompt
+from prompt import Prompt
 
 # Test distribute tokens
 
@@ -10,7 +10,6 @@ def test_prompt_correct_tokens(my_blocks, my_arbitrator):
         tokenize=my_tokenizer,
         max_tokens=2000,
     )
-    print('heere')
     assert_block_lists_equal(my_blocks, prompt.blocks)
     assert 0 == prompt.max_tokens - prompt.tokens_used
 
