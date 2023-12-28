@@ -1,4 +1,22 @@
 [tool.pytest.ini_options]
 pythonpath = [
-  "src"
+  "promptval"
 ]
+
+[tool.poetry]
+name = "promptval"
+version = "0.1.0"
+description = "Validation for LLM prompts."
+authors = ["Chris Vincens <chrisv@buildwithlayer.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^7.4.3"
+tiktoken = "^0.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
