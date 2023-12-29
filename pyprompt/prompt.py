@@ -42,6 +42,10 @@ class Prompt:
         self._distribute_tokens()
         self._validate()
 
+    def __str__(self):
+        """Returns a string representation of this prompt."""
+        return '\n'.join([str(block) for block in self.blocks])
+
 def example():
     """
     An example demonstrating how to use this module.
@@ -56,6 +60,8 @@ def example():
         tokenize=tokenize,
         max_tokens=10,
     )
+
+    print(prompt)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
