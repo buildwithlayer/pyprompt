@@ -54,10 +54,3 @@ class Block(StrictBlock):
         min_idx = len(self.data) - floor(len(self.data) * factor)
         return Block(self.name, self.data[min_idx:], self.to_text)
     
-# For demonstration purposes
-example_blocks = [
-    Block(name="system_prompt", data="aaa", to_text=str),
-    Block(name="user_input", data="bbb", to_text=str),
-    Block(name="chat_history", data="ccc", to_text=str),
-    Block(name="actions", data="ddd", to_text=str),
-]

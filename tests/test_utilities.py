@@ -1,7 +1,7 @@
 import pytest
 import logging
-from arbitrator import *
-from block import Block
+from pyprompt.arbitrator import *
+from pyprompt.blocks import Block
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

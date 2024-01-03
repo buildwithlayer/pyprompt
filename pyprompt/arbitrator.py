@@ -1,6 +1,6 @@
 import tiktoken
 import logging
-from pyprompt.block import Block
+from pyprompt.blocks import Block
 import timeit
 
 logger = logging.getLogger(__name__)

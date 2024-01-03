@@ -1,5 +1,5 @@
 from test_utilities import *
-from prompt import Prompt
+from pyprompt.prompt import Prompt
 
 # Test distribute tokens
 

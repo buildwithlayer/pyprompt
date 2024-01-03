@@ -1,5 +1,5 @@
 import pytest
-from block import Block, StrictBlock
+from pyprompt.blocks import Block, StrictBlock
 
 def test_block_pass():
     block = Block(name="user_input", data="bbb", to_text=str)

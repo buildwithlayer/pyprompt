@@ -2,7 +2,7 @@ import tiktoken
 import logging
 from pyprompt.arbitrator import example_arbitrator
 from pyprompt.prompt import Prompt
-from pyprompt.block import Block
+from pyprompt.blocks import Block
 
 # For demonstration purposes
 example_blocks = [
