@@ -1,7 +1,5 @@
 import tiktoken
 import logging
-from token_distribution import example_arbitrator
-from pyprompt.block import example_blocks
 
 class Prompt:
     """
@@ -46,23 +44,5 @@ class Prompt:
         """Returns a string representation of this prompt."""
         return '\n'.join([str(block) for block in self.blocks])
 
-def example():
-    """
-    An example demonstrating how to use this module.
-    """
-    encoding_name = "cl100k_base"
-
-    tokenize = tiktoken.get_encoding(encoding_name).encode
-
-    prompt = Prompt(
-        blocks=example_blocks,
-        arbitrator=example_arbitrator,
-        tokenize=tokenize,
-        max_tokens=10,
-    )
-
-    print(prompt)
-
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    example()
+    raise NotImplementedError(f"{__path__} This module is not meant to be executed on its own.")
