@@ -1,6 +1,6 @@
 import pytest
 import logging
-from token_distribution import *
+from arbitrator import *
 from block import Block
 
 logger = logging.getLogger(__name__)

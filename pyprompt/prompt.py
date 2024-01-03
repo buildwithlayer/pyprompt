@@ -45,4 +45,4 @@ class Prompt:
         return '\n'.join([str(block) for block in self.blocks])
 
 if __name__ == "__main__":
-    raise NotImplementedError(f"{__path__} This module is not meant to be executed on its own.")
+    raise NotImplementedError(f"{__file__} This module is not meant to be executed on its own.")

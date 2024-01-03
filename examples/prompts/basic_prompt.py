@@ -1,6 +1,6 @@
 import tiktoken
 import logging
-from pyprompt.token_distribution import example_arbitrator
+from pyprompt.arbitrator import example_arbitrator
 from pyprompt.prompt import Prompt
 from pyprompt.block import Block
 
@@ -30,5 +30,4 @@ def example():
     print(prompt)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    example()
+    raise NotImplementedError(f"{__file__} This module is not meant to be executed on its own.")
