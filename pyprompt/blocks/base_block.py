@@ -32,7 +32,14 @@ class BaseBlock:
         self._populator = populator
         self._tokenizer = tokenizer or tiktoken.get_encoding("cl100k_base")
         self._truncator = truncator
-        self._data = data if data is not None else self._populate()
+        
+        if data is None:
+            self._populate() # Runs the populator function
+        else:
+            self._data = data
+        
+        # Apply truncator if provided
+        self._data = self._truncator(self) if self._truncator is not None else self._data
 
         self._validate()
 
@@ -44,14 +51,6 @@ class BaseBlock:
         if not isinstance(self.name, str):
             raise TypeError(f'Block name must be a string, not {type(self.name)}.')
         
-    def _apply(self, func):
-        """
-        Applies the given function to the block's data.
-        """
-        logger.info(f'Running reduce on {self.name} with function {func}.')
-        
-        self._data = func(self._data)
-        
     def _populate(self):
         """
         Repopulates the block content.
@@ -62,15 +61,15 @@ class BaseBlock:
         logger.info(f'_repopulating block content.')
 
         if self._populator is not None:
-            data = self._populator(self)
-
-        if self._truncator is not None:
-            data = self._truncator(self)
+            self._data = self._populator(self)
             
-        if data is None:
+        if self._truncator is not None:
+            self._data = self._truncator(self)
+            
+        if self._data is None:
             raise ValueError(f'Block {self.name} has no data.')
 
-        return data
+        return self._data
         
     def repopulate(self):
         """
@@ -78,5 +77,5 @@ class BaseBlock:
         """
         logger.info(f'Repopulating block content.')
         
-        self._apply(lambda x: self._populate())
+        self._data = self._populate()
             
