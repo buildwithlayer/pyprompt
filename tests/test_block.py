@@ -1,6 +1,11 @@
 import pytest
 from pyprompt.blocks import Block, StrictBlock, ChopBlock, BaseBlock
 
+# ------------------------ Helpers ------------------------
+def populator(block):
+    print(block)
+    return "ccc"
+
 # ------------------------ Base Block ------------------------
 def test_base_block_pass():
     block = BaseBlock(name="user_input", data="bbb")
@@ -9,26 +14,30 @@ def test_base_block_pass():
     
 def test_base_block_fail():
     with pytest.raises(TypeError):
-        BaseBlock(name=None, data="bbb")._validate()
+        BaseBlock(name=None, data="bbb")
 
-def test_base_block_apply():
+def test_base_block__apply():
     block = BaseBlock(name="user_input", data="bbb")
-    block.apply(lambda x: x.upper())
+    block._apply(lambda x: x.upper())
+    
     assert block.name == "user_input"
     assert block._data == "BBB"
     
-def test_base_block_truncate():
-    block = BaseBlock(name="user_input", data="bbb")
-    with pytest.raises(NotImplementedError):
-        block.truncate()
+def test_base_block_populator():
+    block = BaseBlock(name="user_input", populator=populator)
         
-    block.truncate(lambda x: x.upper())
     assert block.name == "user_input"
-    assert block._data == "BBB"
+    assert block._data == "ccc"
+    assert block._populator == populator
     
-def test_base_block_populate():
-    block = BaseBlock(name="user_input", data="bbb")
-    block.populate("ccc")
+def test_base_block_populator_and_data():
+    block = BaseBlock(name="user_input", data="bbb", populator=populator)
+    
+    assert block.name == "user_input"
+    assert block._data == "bbb"
+    assert block._populator == populator
+    
+    block.repopulate()
     assert block.name == "user_input"
     assert block._data == "ccc"
     

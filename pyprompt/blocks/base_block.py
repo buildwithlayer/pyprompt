@@ -5,21 +5,36 @@ logger = logging.getLogger(__name__)
 
 class BaseBlock:
     
-    def __init__(self, name, **kwargs):
-            """
-            Initializes this block object.
+    def __init__(self, name, *, data=None, populator=None, tokenizer=None, truncator=None, **kwargs):
+        """
+        Initializes a BaseBlock object. Either data or populator must be provided. If both are provided, 
+        data is used during initialization and populator is used during repopulation.
 
-            Args:
-                name (str): The name of the block.
-                **kwargs: Additional keyword arguments.
-                    data (Any): Optional data for the block.
-                    tokenizer (Callable): Optional tokenizer for the block. Defaults to the cl100k_base tokenizer. 
-                    Tokenizers must have an encode and decode method.
+        Args:
+            name (str): The name of the block.
+            
+            data (Any, optional): Data for the block.
+            
+            populator (Callable, optional): Called if block needs to be populated. The populator recieves the block as an argument.
+            
+            tokenizer (Callable, optional): Optional tokenizer for the block. Defaults to the cl100k_base tokenizer.
+                Tokenizers must have an encode and decode method.
+            
+            truncator (Callable, optional): Optional truncator for the block. Defaults to None.
+                Truncators must have a truncate method.
+            
+            **kwargs: Additional keyword arguments.
+        """
+        if data is None and populator is None:
+            raise ValueError("Either 'data' or 'populator' must be provided.")
+        
+        self.name = name
+        self._populator = populator
+        self._tokenizer = tokenizer or tiktoken.get_encoding("cl100k_base")
+        self._truncator = truncator
+        self._data = data if data is not None else self._populate()
 
-            """
-            self.name = name
-            self._data = kwargs.get('data')
-            self._tokenizer = kwargs.get('tokenizer') or tiktoken.get_encoding("cl100k_base")
+        self._validate()
 
     
     def _validate(self):
@@ -29,7 +44,7 @@ class BaseBlock:
         if not isinstance(self.name, str):
             raise TypeError(f'Block name must be a string, not {type(self.name)}.')
         
-    def apply(self, func):
+    def _apply(self, func):
         """
         Applies the given function to the block's data.
         """
@@ -37,17 +52,31 @@ class BaseBlock:
         
         self._data = func(self._data)
         
-    def truncate(self, func=None):
+    def _populate(self):
         """
-        Truncates the block's data if a function is given, otherwise raises a NotImplementedError.
+        Repopulates the block content.
+
+        Returns:
+            dict: The repopulated block content.
         """
-        if func is not None:
-            self.apply(func)
-        else:
-            raise NotImplementedError(f"{__file__} This method must be implemented by a derived class.")
+        logger.info(f'_repopulating block content.')
+
+        if self._populator is not None:
+            data = self._populator(self)
+
+        if self._truncator is not None:
+            data = self._truncator(self)
             
-    def populate(self, data, **kwargs):
+        if data is None:
+            raise ValueError(f'Block {self.name} has no data.')
+
+        return data
+        
+    def repopulate(self):
         """
-        Attempts to populate the block with additional tokens.
+        Repopulates the block with data using the populator and truncator functions if provided.
         """
-        self._data = data
+        logger.info(f'Repopulating block content.')
+        
+        self._apply(lambda x: self._populate())
+            

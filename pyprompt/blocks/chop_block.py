@@ -17,11 +17,11 @@ class ChopBlock(BaseBlock):
     """
 
     def __init__(self, name, chop_block='start', max_tokens=1000, **kwargs):
-        super().__init__(name, **kwargs)
+
         self.max_tokens = max_tokens
-        
-        print(f"chopdirection: {chop_block}")
         self.chop_block = chop_block
+        
+        super().__init__(name, **kwargs)
         
     def _validate(self):
         """
@@ -34,23 +34,25 @@ class ChopBlock(BaseBlock):
             raise ValueError(f"max_tokens must be non-negative, not {self.max_tokens}")
         if self.chop_block not in ['start', 'end']:
             raise ValueError(f"Invalid chop_block direction: {self.chop_block}")
-
+    
     def truncate(self):
+        """
+        Publicly facing function that calls _truncate.
+        """
+        tokens = self._tokenizer.encode(self._data)
+        self._truncate(tokens)
+        
+    @staticmethod
+    def _chop(tokens, max_tokens, chop_block):
         """
         Reduces the block's data by chopping off tokens.
         """
         logger.info(f'Chopping block content')
-        tokens = self._tokenizer.encode(self._data)
         
-        if self.chop_block == 'start':
-            self._data = self._tokenizer.decode(tokens[-self.max_tokens:])
-        elif self.chop_block == 'end':
-            self._data = self._tokenizer.decode(tokens[:self.max_tokens])
+        if chop_block == 'start':
+            return tokens[-max_tokens:]
+        elif chop_block == 'end':
+            tokens[:max_tokens]
         else:
-            raise ValueError(f"Invalid chop_block direction: {self.chop_block}")
+            raise ValueError(f"Invalid chop_block direction: {chop_block}")
         
-    def populate(self, data):
-        
-        self._data = data
-        self.truncate()
-    
