@@ -56,6 +56,11 @@ def test_chop_block_end():
 def test_chop_block_repopulate():
     block = ChopBlock(name="user_input", chop_block='end', max_tokens=3, data="a b c d", populator=addative_populator)
     
+    assert block.name == "user_input"
+    assert block.max_tokens == 3
+    assert block.chop_block == 'end'
+    assert block._data == "a b c"
+    
     block.repopulate()
     assert block.name == "user_input"
     assert block._data == "ccc a b"

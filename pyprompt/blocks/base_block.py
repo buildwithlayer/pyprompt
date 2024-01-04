@@ -32,15 +32,16 @@ class BaseBlock:
         self._populator = populator
         self._tokenizer = tokenizer or tiktoken.get_encoding("cl100k_base")
         self._truncator = truncator
+        self._data = data
+    
+        self._post_init()
         
-        if data is None:
-            self._populate() # Runs the populator function
-        else:
-            self._data = data
+    def _post_init(self):
         
-        # Apply truncator if provided
-        self._data = self._truncator(self) if self._truncator is not None else self._data
-
+        if self._data is None:
+            self._populate()
+            
+        self._truncate()
         self._validate()
 
     
@@ -51,25 +52,32 @@ class BaseBlock:
         if not isinstance(self.name, str):
             raise TypeError(f'Block name must be a string, not {type(self.name)}.')
         
-    def _populate(self):
+    def _populate_and_truncate(self):
         """
-        Repopulates the block content.
+        Repopulates the block content and truncates it.
 
         Returns:
             dict: The repopulated block content.
         """
-        logger.info(f'_repopulating block content.')
+        logger.info(f'populating and truncation block content.')
 
-        if self._populator is not None:
-            self._data = self._populator(self)
-            
+        self._populate()
+        
+        self._truncate()
+        
+    def _truncate(self):
         if self._truncator is not None:
             self._data = self._truncator(self)
             
         if self._data is None:
-            raise ValueError(f'Block {self.name} has no data.')
-
-        return self._data
+            raise ValueError(f'Block {self.name} has no data after truncating.')
+        
+    def _populate(self):
+        if self._populator is not None:
+            self._data = self._populator(self)
+        
+        if self._data is None:
+            raise ValueError(f'Block {self.name} has no data after populating.')
         
     def repopulate(self):
         """
@@ -77,5 +85,5 @@ class BaseBlock:
         """
         logger.info(f'Repopulating block content.')
         
-        self._data = self._populate()
+        self._populate_and_truncate()
             
