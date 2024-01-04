@@ -1,5 +1,6 @@
 import logging
 import tiktoken
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +14,16 @@ class BaseBlock:
         Args:
             name (str): The name of the block.
             
-            data (Any, optional): Data for the block.
+            data (Any, optional): Data for the block. Can be any type.
             
-            populator (Callable, optional): Called if block needs to be populated. The populator recieves the block as an argument.
+            populator (Callable, optional): Called if block needs to be populated. The populator recieves the block as an 
+                argument and returns data for the block.
             
             tokenizer (Callable, optional): Optional tokenizer for the block. Defaults to the cl100k_base tokenizer.
                 Tokenizers must have an encode and decode method.
             
             truncator (Callable, optional): Optional truncator for the block. Defaults to None.
-                Truncators must have a truncate method.
+                Truncators must take a block as an argument and return a truncated version of the block's data.
             
             **kwargs: Additional keyword arguments.
         """
@@ -32,12 +34,11 @@ class BaseBlock:
         self._populator = populator
         self._tokenizer = tokenizer or tiktoken.get_encoding("cl100k_base")
         self._truncator = truncator
-        self._data = data
+        self._data = copy.deepcopy(data)
     
         self._post_init()
         
     def _post_init(self):
-        
         if self._data is None:
             self._populate()
             
