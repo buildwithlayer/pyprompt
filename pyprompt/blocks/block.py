@@ -1,56 +1,25 @@
-from math import floor
-import logging
+from typing import Generic, List, Optional, Tuple, TypeVar
+import tiktoken
 
-logger = logging.getLogger(__name__)
-    
-class StrictBlock:
-    """
-    Represents a section of the prompt, including its name and its contents.
-    This type of block cannot be reduced.
-    To create a block with more specific behavior, derive from this class.
-    """
+from pyprompt.tokenizers import Tokenizer
 
-    def _validate(self):
-        """
-        Validates the block.
-        """
-        if not isinstance(self.name, str):
-            raise TypeError(f'Block name must be a string, not {type(self.name)}.')
-        if self.data is None:
-            raise TypeError(f'Block data cannot be None.')
-        if not callable(self.to_text):
-            raise TypeError(f'Block to_text must be a callable, not {type(self.to_text)}.')
-        
-    def __init__(self, name, data, to_text):
-        """
-        Initializes this block object.
+__all__ = ["Block"]
 
-        Args:
-            name: The name of the block.
-            data: The contents of the block.
-            to_text: The text representation of the data. If the data is
-            conceptually empty, an empty string should be returned.
-        """
+T = TypeVar("T")
+
+
+class Block(Generic[T]):
+    def __init__(self, name: str, data: T, tokenizer: Optional[Tokenizer] = None):
         self.name = name
         self.data = data
-        self.to_text = to_text
-        
-        self._validate()
+        if tokenizer is None:
+            tokenizer = tiktoken.get_encoding("cl100k_base")
+        self.tokenizer = tokenizer
     
-    def __str__(self):
-        return self.to_text(self.data)
+    def format(self, data: Optional[T] = None) -> str:
+        raise NotImplementedError
 
-class Block(StrictBlock):
-    """
-    Represents a section of the prompt, including its name and its contents.
-    To create a block with more specific behavior, derive from this class.
-    """
-
-    def reduce(self, factor):
-        """
-        Creates a new block with content reduced by the given factor.
-        """
-        logger.info(f'Running reduce on {self.name} with factor {factor}.')
-        min_idx = len(self.data) - floor(len(self.data) * factor)
-        return Block(self.name, self.data[min_idx:], self.to_text)
+    def truncate(self, max_tokens: int) -> Tuple[T, int]:
+        raise NotImplementedError
     
+

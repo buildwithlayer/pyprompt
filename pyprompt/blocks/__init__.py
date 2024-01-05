@@ -1,4 +1,3 @@
-from pyprompt.blocks.block import Block, StrictBlock
-from pyprompt.blocks.base_block import BaseBlock
-from pyprompt.blocks.chop_block import ChopBlock
-from pyprompt.blocks.chat_block import ChatBlock
+from .block import *
+from .chat_history_block import *
+from .chop_block import *
