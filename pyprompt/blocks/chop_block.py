@@ -13,7 +13,16 @@ class ChopType(str, Enum):
 
 
 class ChopBlock(Block[str]):
+    """A block that chops data to a specified length."""
+
     def __init__(self, name: str, data: str, tokenizer: Optional[Tokenizer] = None, chop_type: ChopType = ChopType.END):
+        """
+        Initialize a ChopBlock instance.
+
+        Args:
+            data (str): The data to be chopped.
+            chop_type (ChopType): The type of chopping to be performed (default: ChopType.END).
+        """
         super().__init__(name, data, tokenizer)
         self.chop_type = chop_type
 

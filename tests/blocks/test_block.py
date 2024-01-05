@@ -1,4 +1,3 @@
-import pytest
 from pyprompt.blocks import Block
 
 # ------------------------ Base Block ------------------------
@@ -7,4 +6,3 @@ def test_block_pass():
 
     assert block.name == "user_input"
     assert block.data == "bbb"
-    

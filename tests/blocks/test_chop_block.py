@@ -1,8 +1,5 @@
-import pytest
-
 from pyprompt.blocks import ChopBlock
 from pyprompt.tokenizers import SimpleTokenizer
-
 
 # ------------------------ Chop Block ------------------------
 def test_chop_block():
