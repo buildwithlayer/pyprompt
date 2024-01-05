@@ -29,7 +29,7 @@ def test_chop_block_start():
     assert block.data == formatted
 
     truncated, new_length = block.truncate(3)
-    assert truncated == "a b"
+    assert truncated == "a b c"
     assert new_length == 3
 
 

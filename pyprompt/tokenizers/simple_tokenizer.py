@@ -7,9 +7,9 @@ __all__ = ["SimpleTokenizer"]
 
 class SimpleTokenizer(Tokenizer):
     @staticmethod
-    def encode(data: str) -> List[int]:
-        return [ord(ch) for ch in data]
+    def encode(data: str) -> List[str]:
+        return data.split()
     
     @staticmethod
-    def decode(data: List[int]) -> str:
-        return "".join([chr(i) for i in data])
+    def decode(data: List[str]) -> str:
+        return " ".join(data)

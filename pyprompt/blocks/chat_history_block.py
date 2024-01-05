@@ -66,6 +66,8 @@ class ChatHistoryBlock(Block[List[Message]]):
             if len(encoded) <= max_tokens:
                 return new_data, len(encoded)
         
+        return [], 0
+        
     def _summary_truncate(self, max_tokens: int):
         """Truncates the chat history data using a summary truncation method."""
         raise NotImplementedError

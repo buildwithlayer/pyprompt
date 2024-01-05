@@ -15,20 +15,28 @@ def test_chat_block():
     
     assert block.data == sample_message_data
 
-    truncated, length = block.truncate(17)
-    assert truncated == sample_message_data[2:]
-    assert length == 17
+    truncated, length = block.truncate(4)
+    assert truncated == []
+    assert length == 0
     
-    truncated, length = block.truncate(20)
+    # test 1 message
+    truncated, length = block.truncate(5)
     assert truncated == sample_message_data[2:]
-    assert length == 17
+    assert length == 5
+    
+    # test 1 extra space
+    truncated, length = block.truncate(7)
+    assert truncated == sample_message_data[2:]
+    assert length == 5
 
+    # test all messages
     truncated, length = block.truncate(1000)
     assert truncated == sample_message_data
-    assert length == 75
+    assert length == 16
 
-    truncated, length = block.truncate(74)
+    truncated, length = block.truncate(9)
     assert truncated == sample_message_data[1:]
+    assert length == 9
 
 
 
