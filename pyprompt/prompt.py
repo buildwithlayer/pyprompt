@@ -1,11 +1,17 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, TypedDict
 from .blocks import Block
+from .types import Wrap
 
 class Allocator:
     pass
 
+class PromptBlock:
+    block: Block
+    initial_tokens: int
+    wrap: Wrap
+
 class PromptBuilder:
-    def __init__(self, max_tokens: int, blocks: List[Dict[str, int]], allocator: Optional[Allocator] = None):
+    def __init__(self, max_tokens: int, blocks: List[PromptBlock], allocator: Optional[Allocator] = None):
         if max_tokens is None:
             raise ValueError("max_tokens parameter is required.")
         
@@ -40,12 +46,13 @@ class PromptBuilder:
             if "block" not in block and not isinstance(block["block"], Block):
                 raise ValueError("All blocks must have a 'block' key and must inherit the Block class.")
             else:
-                max_tokens = block["initial_tokens"]
+                max_tokens = block.get("initial_tokens")
+                wrap = block.get("wrap", False)
                 block: Block = block["block"]
                 
             
-            truncated_block, remaining_tokens = block.truncate(max_tokens=max_tokens)
-            prompt += block.format(truncated_block)
+            truncated_block, remaining_tokens = block.truncate(max_tokens=max_tokens, wrap=wrap)
+            prompt += block.format(truncated_block, wrap=wrap)
             
         return prompt
 

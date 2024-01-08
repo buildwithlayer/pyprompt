@@ -20,7 +20,7 @@ class Block(Generic[T]):
         tokenizer (Optional[Tokenizer]): The tokenizer to use for the block. Defaults to None.
 
     Methods:
-        format(data: Optional[T] = None, wrap: Wrap = True) -> str: Formats the block's data into a string representation.
+        format(data: Optional[T] = None, wrap: Wrap = False) -> str: Formats the block's data into a string representation.
         truncate(max_tokens: int) -> Tuple[T, int]: Truncates the block's data to a specified maximum number of tokens.
     """
     def __init__(self, name: str, data: T, tokenizer: Optional[Tokenizer] = None):
@@ -39,13 +39,13 @@ class Block(Generic[T]):
         else:
             return data
     
-    def format(self, data: Optional[T] = None, wrap: Wrap = True) -> str:
+    def format(self, data: Optional[T] = None, wrap: Wrap = False) -> str:
         """
         Formats the block's data into a string representation.
         """
         raise NotImplementedError(f"{self.__class__.__name__} does not implement format()")
 
-    def truncate(self, max_tokens: int) -> Tuple[T, int]:
+    def truncate(self, max_tokens: int, wrap: Wrap = False) -> Tuple[T, int]:
         """
         Truncates the block's data to a specified maximum number of tokens.
         """

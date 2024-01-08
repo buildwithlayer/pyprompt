@@ -19,7 +19,7 @@ class Message(TypedDict):
 class ChatHistoryBlock(Block[List[Message]]):
     """Represents a block that displays chat history."""
     
-    def format(self, data: Optional[List[Message]] = None, wrap: Wrap = True) -> str:
+    def format(self, data: Optional[List[Message]] = None, wrap: Wrap = False) -> str:
         """Formats the chat history data into a string representation."""
         
         if data is None:

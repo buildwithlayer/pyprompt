@@ -28,16 +28,21 @@ class ChopBlock(Block[str]):
         super().__init__(name, data, tokenizer)
         self.chop_type = chop_type
 
-    def format(self, data: Optional[str] = None, wrap: Wrap = True) -> str:
+    def format(self, data: Optional[str] = None, wrap: Wrap = False) -> str:
         if data is None:
             data = self.data
             
+        if wrap is True:
+            wrap = ("", "\n")
+        
         wrapped = self._wrap(data, wrap)
         
         return wrapped
     
-    def truncate(self, max_tokens: int) -> Tuple[str, int]:
-        encoded = self.tokenizer.encode(self.data)
+    def truncate(self, max_tokens: int, wrap: Wrap = False) -> Tuple[str, int]:
+        
+        
+        encoded = self.tokenizer.encode(self._wrap(self.data, wrap=wrap))
         if self.chop_type == ChopType.END:
             encoded = encoded[:max_tokens]
         else:
