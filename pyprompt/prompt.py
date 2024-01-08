@@ -1,27 +1,33 @@
-import tiktoken
-import logging
+from typing import List, Optional, Dict
 from .blocks import Block
-from typing import List, Tuple, Optional
 
 class Allocator:
     pass
 
 class PromptBuilder:
-    def __init__(self, max_tokens, blocks: List[Tuple[Block, int]], allocator: Optional[Allocator] = None):
+    def __init__(self, max_tokens: int, blocks: List[Dict[str, int]], allocator: Optional[Allocator] = None):
+        if max_tokens is None:
+            raise ValueError("max_tokens parameter is required.")
+        
         self.max_tokens = max_tokens
         self.blocks = blocks
         self.allocator = allocator
         
+        self._post_init()
+        
     def _post_init(self):
-        if not self._check_blocks():
-            raise ValueError("The total number of tokens in the blocks is greater than the maximum allowed tokens.")
+        self._check_blocks()
         
     def _check_blocks(self):
         """
         Checks if the total number of tokens in the blocks is less than or equal to the maximum allowed tokens.
         """
-        total_tokens = sum([block[1] for block in self.blocks])
-        return total_tokens <= self.max_tokens
+            
+        lst = [block["initial_tokens"] for block in self.blocks]
+        total_tokens = sum(lst)
+        
+        if total_tokens > self.max_tokens:
+            raise ValueError("The total number of tokens in the blocks is greater than the maximum allowed tokens.")
         
     def build(self) -> str:
         """
@@ -29,9 +35,17 @@ class PromptBuilder:
         """
         
         prompt = ""
-        for (block, i) in self.blocks:
-            truncted_block, remaining_tokens = block.truncate(max_tokens=i)
-            prompt += block.format(truncted_block)
+        for block in self.blocks:
+            
+            if "block" not in block and not isinstance(block["block"], Block):
+                raise ValueError("All blocks must have a 'block' key and must inherit the Block class.")
+            else:
+                max_tokens = block["initial_tokens"]
+                block: Block = block["block"]
+                
+            
+            truncated_block, remaining_tokens = block.truncate(max_tokens=max_tokens)
+            prompt += block.format(truncated_block)
             
         return prompt
 
