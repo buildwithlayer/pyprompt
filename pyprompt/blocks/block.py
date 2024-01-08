@@ -1,7 +1,9 @@
-from typing import Generic, List, Optional, Tuple, TypeVar
+from typing import Generic, Optional, Tuple, TypeVar
 import tiktoken
 
 from pyprompt.tokenizers import Tokenizer
+
+from ..types import Wrap
 
 __all__ = ["Block"]
 
@@ -18,7 +20,7 @@ class Block(Generic[T]):
         tokenizer (Optional[Tokenizer]): The tokenizer to use for the block. Defaults to None.
 
     Methods:
-        format(data: Optional[T] = None) -> str: Formats the block's data into a string representation.
+        format(data: Optional[T] = None, wrap: Wrap = True) -> str: Formats the block's data into a string representation.
         truncate(max_tokens: int) -> Tuple[T, int]: Truncates the block's data to a specified maximum number of tokens.
     """
     def __init__(self, name: str, data: T, tokenizer: Optional[Tokenizer] = None):
@@ -27,8 +29,17 @@ class Block(Generic[T]):
         if tokenizer is None:
             tokenizer = tiktoken.get_encoding("cl100k_base")
         self.tokenizer = tokenizer
+        
+    def _wrap(self, data: str, wrap: Wrap) -> str:
+        """
+        Wraps the data in the specified wrap.
+        """
+        if isinstance(wrap, tuple) and len(wrap) == 2 and all(isinstance(w, str) for w in wrap):
+            return f"{wrap[0]}{data}{wrap[1]}"
+        else:
+            return data
     
-    def format(self, data: Optional[T] = None) -> str:
+    def format(self, data: Optional[T] = None, wrap: Wrap = True) -> str:
         """
         Formats the block's data into a string representation.
         """
@@ -39,5 +50,3 @@ class Block(Generic[T]):
         Truncates the block's data to a specified maximum number of tokens.
         """
         raise NotImplementedError(f"{self.__class__.__name__} does not implement format()")
-    
-

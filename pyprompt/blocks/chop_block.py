@@ -3,6 +3,7 @@ from typing import Tuple, Optional
 from enum import Enum
 
 from .block import Block
+from ..types import Wrap
 from pyprompt.tokenizers.tokenizer import Tokenizer
 
 __all__ = ["ChopBlock"]
@@ -22,15 +23,18 @@ class ChopBlock(Block[str]):
         Args:
             data (str): The data to be chopped.
             chop_type (ChopType): The type of chopping to be performed (default: ChopType.END).
+            **kwargs: Additional keyword arguments to be passed to the super class.
         """
         super().__init__(name, data, tokenizer)
         self.chop_type = chop_type
 
-    def format(self, data: Optional[str] = None) -> str:
+    def format(self, data: Optional[str] = None, wrap: Wrap = True) -> str:
         if data is None:
             data = self.data
+            
+        wrapped = self._wrap(data, wrap)
         
-        return data
+        return wrapped
     
     def truncate(self, max_tokens: int) -> Tuple[str, int]:
         encoded = self.tokenizer.encode(self.data)

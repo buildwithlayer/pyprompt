@@ -30,7 +30,7 @@ class PromptBuilder:
         
         prompt = ""
         for (block, i) in self.blocks:
-            truncted_block = block.truncate(max_tokens=i)
+            truncted_block, remaining_tokens = block.truncate(max_tokens=i)
             prompt += block.format(truncted_block)
             
         return prompt

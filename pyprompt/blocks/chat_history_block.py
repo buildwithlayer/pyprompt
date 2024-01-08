@@ -1,5 +1,6 @@
 from typing import Callable, List, Optional, Tuple, TypedDict
 from .block import Block
+from ..types import Wrap
 from enum import Enum
 
 __all__ = ["ChatHistoryBlock", "Message", "Role"]
@@ -18,7 +19,7 @@ class Message(TypedDict):
 class ChatHistoryBlock(Block[List[Message]]):
     """Represents a block that displays chat history."""
     
-    def format(self, data: Optional[List[Message]] = None) -> str:
+    def format(self, data: Optional[List[Message]] = None, wrap: Wrap = True) -> str:
         """Formats the chat history data into a string representation."""
         
         if data is None:
@@ -28,13 +29,21 @@ class ChatHistoryBlock(Block[List[Message]]):
             f"{message['role']}: {message['content']}" for message in data
         ]
         
-        return "\n".join(formatted_messages)
+        joined = "\n".join(formatted_messages)
+        
+        if wrap == True:
+            wrap = ("Chat History:\n", "")
+        
+        wrapped = self._wrap(joined, wrap)
+        
+        return wrapped
     
     def truncate(
             self,
             max_tokens: int,
             truncation_type: Optional[str] = "simple",
             truncation_method: Optional[Callable[[int], Tuple[List[Message], int]]] = None,
+            wrap: Wrap = False,
     ) -> Tuple[List[Message], int]:
         """Truncates the chat history data to fit within a maximum number of tokens.
         
@@ -54,14 +63,14 @@ class ChatHistoryBlock(Block[List[Message]]):
             else:
                 raise ValueError(f"Unknown truncation type: {truncation_type}")
             
-        return truncation_method(max_tokens)
+        return truncation_method(max_tokens, wrap=wrap)
         
 
-    def _simple_truncate(self, max_tokens: int):
+    def _simple_truncate(self, max_tokens: int, wrap: Wrap = False):
         """Fits as many full messages as possible into the given number of tokens."""
         for i in range(0, len(self.data)):
             new_data = self.data[i:]
-            formatted = self.format(new_data)
+            formatted = self.format(new_data, wrap=wrap)
             encoded = self.tokenizer.encode(formatted)
             if len(encoded) <= max_tokens:
                 return new_data, len(encoded)

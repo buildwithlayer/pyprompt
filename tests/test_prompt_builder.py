@@ -15,7 +15,8 @@ def test_build_prompt_chop():
     # Assert that the prompt is built correctly
     assert prompt_builder.build() == prompt_str
 
-prompt_str = """system: Do you think you are cool
+prompt_str = """Chat History:
+system: Do you think you are cool
 user: like really cool?
 user: no I not :("""
 
