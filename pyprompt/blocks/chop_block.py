@@ -4,7 +4,7 @@ from enum import Enum
 
 from .block import Block
 from ..types import Wrap
-from pyprompt.tokenizers.tokenizer import Tokenizer
+from ..tokenizers import Tokenizer
 
 __all__ = ["ChopBlock"]
 

@@ -1,7 +1,7 @@
 from typing import Generic, Optional, Tuple, TypeVar
 import tiktoken
 
-from pyprompt.tokenizers import Tokenizer
+from ..tokenizers import Tokenizer
 
 from ..types import Wrap
 

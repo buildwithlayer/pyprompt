@@ -1,6 +1,8 @@
 from typing import List, Optional, Dict, TypedDict
-from .blocks import Block
-from .types import Wrap
+from ..blocks import Block
+from ..types import Wrap
+
+__all__ = ["PromptBuilder", "PromptBlock"]
 
 class Allocator:
     pass

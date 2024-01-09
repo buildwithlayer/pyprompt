@@ -1,4 +1,4 @@
-from pyprompt.prompt import PromptBuilder
+from pyprompt.pyprompt.prompts.prompt import PromptBuilder
 from pyprompt.blocks import *
 import pytest
 import textwrap
