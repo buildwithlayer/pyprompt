@@ -1,9 +1,11 @@
-from typing import Callable, List, Optional, Tuple, TypedDict
+from __future__ import annotations
+from typing import Callable, List, Optional, Tuple, TypedDict, Union
+
+from pyprompt.blocks.block import Buildables
 from .block import Block
-from ..types import Wrap
 from enum import Enum
 
-__all__ = ["ChatHistoryBlock", "Message", "Role"]
+__all__ = ["ChatHistoryBlock", "Message", "Role", "MessageTruncator"]
 
 class Role(str, Enum):
     USER = "user"
@@ -14,69 +16,69 @@ class Role(str, Enum):
 class Message(TypedDict):
     role: Role
     content: str
+    
+MessageTruncator = Callable[[int], Tuple[List[Message], int]]
 
 
 class ChatHistoryBlock(Block[List[Message]]):
     """Represents a block that displays chat history."""
     
-    def format(self, data: Optional[List[Message]] = None, wrap: Wrap = False) -> str:
-        """Formats the chat history data into a string representation."""
-        
-        if data is None:
-            data = self.data
-        
+    class Formats(Enum):
+        MESSAGES = "messages"
+        STRING = "string"
+    
+    @staticmethod
+    def _string_format(data: List[Message]):
         formatted_messages = [
             f"{message['role']}: {message['content']}" for message in data
         ]
         
-        joined = "\n".join(formatted_messages)
+        return "\n".join(formatted_messages)
+    
+    def format(self, to: ChatHistoryBlock.Formats = None, **kwargs) -> ChatHistoryBlock:
+        """Formats the chat history data into a string representation."""
         
-        if wrap == True:
-            wrap = ("Chat History:\n", "")
+        if to == None:
+            to = ChatHistoryBlock.Formats.STRING
         
-        wrapped = self._wrap(joined, wrap)
-        
-        return wrapped
+        if to == ChatHistoryBlock.Formats.STRING:
+            self.data = ChatHistoryBlock._string_format(self.data)
+            
+        return self
     
     def truncate(
             self,
             max_tokens: int,
-            truncation_type: Optional[str] = "simple",
-            truncation_method: Optional[Callable[[int], Tuple[List[Message], int]]] = None,
-            wrap: Wrap = False,
-    ) -> Tuple[List[Message], int]:
-        """Truncates the chat history data to fit within a maximum number of tokens.
+            truncate: Optional[Union[str, MessageTruncator]] = "simple",
+    ) -> ChatHistoryBlock:
         
-        Args:
-            max_tokens (int): The maximum number of tokens allowed.
-            truncation_type (Optional[str]): The type of truncation to perform. Defaults to "simple".
-            truncation_method: Override the truncation method. Defaults to None.
+        if callable(truncate):
+            self.data, _ = truncate(max_tokens, self.data)
+        elif truncate == "simple":
+            self.data, _ = self._simple_truncate(max_tokens)
+        elif truncate == "summary":
+            self.data, _ = self._summary_truncate(max_tokens)
+        else:
+            raise ValueError(f"Unknown truncation type: {truncate}")
         
-        Returns:
-            Tuple[List[Message], int]: The truncated chat history data and the number of tokens used.
-        """
-        if truncation_method is None:
-            if truncation_type == "simple":
-                truncation_method = self._simple_truncate
-            elif truncation_type == "summary":
-                truncation_method = self._summary_truncate
-            else:
-                raise ValueError(f"Unknown truncation type: {truncation_type}")
-            
-        return truncation_method(max_tokens, wrap=wrap)
+        return self
+    
+    def _count_messages_tokens(self, messages: List[Message]):
+        stringified = [f"{message['role']}: {message['content']}" for message in messages]
+        encoded = [self.tokenizer.encode(message) for message in stringified]
         
+        return sum([len(tokens) for tokens in encoded])
 
-    def _simple_truncate(self, max_tokens: int, wrap: Wrap = False):
-        """Fits as many full messages as possible into the given number of tokens."""
-        for i in range(0, len(self.data)):
-            new_data = self.data[i:]
-            formatted = self.format(new_data, wrap=wrap)
-            encoded = self.tokenizer.encode(formatted)
-            if len(encoded) <= max_tokens:
-                return new_data, len(encoded)
+    def _simple_truncate(self, max_tokens: int) -> Tuple[List[Message], int]:
+        total_tokens = 0
+
+        messages = self.data.copy()
         
-        return [], 0
+        while self._count_messages_tokens(messages) > max_tokens:
+            messages.pop(0)
+
+        return messages, total_tokens
         
-    def _summary_truncate(self, max_tokens: int):
+    def _summary_truncate(self, max_tokens: int) -> Tuple[List[Message], int]:
         """Truncates the chat history data using a summary truncation method."""
         raise NotImplementedError

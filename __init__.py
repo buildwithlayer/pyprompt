@@ -1,3 +1,3 @@
 from .pyprompt.blocks import *
-from .pyprompt.prompts import *
-from .pyprompt.types import *
+from .pyprompt.builders import *
+from .pyprompt.tokenizers import *
