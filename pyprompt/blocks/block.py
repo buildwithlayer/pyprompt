@@ -49,5 +49,5 @@ class Block(Generic[T]):
         """
             
         return self.data
-
+    
 Buildables = Union[List, Dict, Block, str]

@@ -11,7 +11,8 @@ class Builder:
         lst = []
         for _, item in enumerate(T):
             if isinstance(item, ChatHistoryBlock):
-                lst.extend(item.build())
+                messages = item.build()
+                lst.extend([self.build(m) for m in messages])
             else:
                 lst.append(self.build(item))
                 

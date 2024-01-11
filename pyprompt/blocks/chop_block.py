@@ -59,13 +59,15 @@ class ChopBlock(Block[str]):
         return self
 
     # Block._check_formatted
-    def truncate(self, max_tokens: int) -> ChopBlock:
+    def truncate(self, max_tokens: int, **kwargs) -> ChopBlock:
         """
         Truncates the data in the block to a maximum number of tokens.
         """
         encoded = self.tokenizer.encode(self.data)
 
-        if self.chop_type == ChopType.END:
+        
+
+        if kwargs.get("chop_type", ChopType.END) == ChopType.END:
             encoded = encoded[:max_tokens]
         else:
             encoded = encoded[-max_tokens:]
