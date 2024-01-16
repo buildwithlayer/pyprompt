@@ -1,4 +1,5 @@
 from __future__ import annotations
+import stat
 from typing import Dict, Generic, List, Optional, TypeVar, Union
 import tiktoken
 
@@ -32,13 +33,11 @@ class Block(Generic[T]):
         
     def format(self, to: str = None, **kwargs) -> Block[T]:
         self._has_been_formatted = True
-        
+    
     @staticmethod
-    def _check_formatted(func):
+    def _queue(func):
         def wrapper(self, *args, **kwargs):
-            if not self._has_been_formatted:
-                raise RuntimeError("Attempted to run a method after formatting the block. This is not allowed. Please format the block last.")
-            return func(self, *args, **kwargs)
+            self._q.append((func, args, kwargs))
         return wrapper
 
     def build(self) -> Buildables:
@@ -48,7 +47,11 @@ class Block(Generic[T]):
         Returns:
             Buildables: The buildables generated from the block.
         """
-            
+        
+        # Apply all queued methods to the data
+        for func, args, kwargs in self._q:
+            func(self, *args, **kwargs)
+        
         return self.data
     
 Buildables = Union[List, Dict, Block, str]
