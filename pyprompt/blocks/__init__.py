@@ -1,3 +1,3 @@
-from .block import *
-from .chat_history_block import *
-from .chop_block import *
+from .block import Block, Buildables
+from .chop_block import ChopBlock
+from .chat_history_block import ChatHistoryBlock

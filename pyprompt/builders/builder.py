@@ -1,9 +1,8 @@
 from typing import List
 
 import tiktoken
-from blocks import Block, Buildables, ChatHistoryBlock
-from tokenizers import Tokenizer
-
+from ..blocks import Block, Buildables, ChatHistoryBlock, ChopBlock
+from ..tokenizers import Tokenizer
 
 __all__ = ["Builder"]
 

@@ -31,11 +31,6 @@ def test_build_prompt_chop():
         ]
     )
     
-    if prompt == prompt_solution:
-        print("True")
-    else:
-        print("False")
-    
     # Assert that the prompt is built correctly
     assert prompt == prompt_solution
 

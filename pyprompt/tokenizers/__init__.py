@@ -1,2 +1,2 @@
-from .tokenizer import *
-from .simple_tokenizer import *
+from .tokenizer import Tokenizer
+from .simple_tokenizer import SimpleTokenizer

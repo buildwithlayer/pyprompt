@@ -3,8 +3,8 @@ from pyexpat.errors import messages
 from typing import Tuple, Optional
 from enum import Enum
 
-from .block import Block, Buildables
-from tokenizers import Tokenizer
+from .block import Block
+from ..tokenizers import Tokenizer
 
 __all__ = ["ChopBlock"]
 
