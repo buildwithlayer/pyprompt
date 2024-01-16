@@ -64,17 +64,16 @@ class ChatHistoryBlock(Block[List[Message]]):
     
     def _count_messages_tokens(self, messages: List[Message]):
         stringified = [f"{message['role']}: {message['content']}" for message in messages]
-        pass
         encoded = [self.tokenizer.encode(message) for message in stringified]
-        pass
         sumed = sum([len(tokens) for tokens in encoded])
-        pass
         return sumed
 
     def _simple_truncate(self, max_tokens: int) -> Tuple[List[Message], int]:
         total_tokens = 0
 
         messages = self.data.copy()
+        
+        count = self._count_messages_tokens(messages)
         
         while self._count_messages_tokens(messages) > max_tokens:
             messages.pop(0)

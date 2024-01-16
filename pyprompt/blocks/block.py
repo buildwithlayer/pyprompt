@@ -24,6 +24,7 @@ class Block(Generic[T]):
         self.data = data
         self._original_data = data
         self._has_been_formatted = False
+        self._q = []
 
         if tokenizer is None:
             tokenizer = tiktoken.get_encoding("cl100k_base")
@@ -32,13 +33,13 @@ class Block(Generic[T]):
     def format(self, to: str = None, **kwargs) -> Block[T]:
         self._has_been_formatted = True
         
-    # @staticmethod
-    # def _check_formatted(func):
-    #     def wrapper(self, *args, **kwargs):
-    #         if not self._has_been_formatted:
-    #             raise RuntimeError("Attempted to run a method after formatting the block. This is not allowed. Please format the block last.")
-    #         return func(self, *args, **kwargs)
-    #     return wrapper
+    @staticmethod
+    def _check_formatted(func):
+        def wrapper(self, *args, **kwargs):
+            if not self._has_been_formatted:
+                raise RuntimeError("Attempted to run a method after formatting the block. This is not allowed. Please format the block last.")
+            return func(self, *args, **kwargs)
+        return wrapper
 
     def build(self) -> Buildables:
         """

@@ -6,7 +6,7 @@ import textwrap
 
 messages = [
     {"role": "assistant", "content": "Welcome to our chat assistant! How can I assist you today?"},
-    {"role": "user", "content": ChopBlock("I need help with my account settings.").truncate(4)},
+    {"role": "user", "content": "I need help with this cool stuff please"},
     {"role": "assistant", "content": "Sure! What specific account settings do you need help with?"}, 
 ]
 
@@ -16,7 +16,7 @@ def test_build_prompt_chop():
         {"role": "system", "content": "testing the chop block"},
         {"role": "user", "content": "testing the chop block cool"},
         {"role": "system", "content": "Previous Chat Conversation:"},
-        {"role": "user", "content": "I need help with"},
+        {"role": "user", "content": "I need help with this cool stuff please"},
         {"role": "assistant", "content": "Sure! What specific account settings do you need help with?"},
     ]
 
@@ -27,7 +27,7 @@ def test_build_prompt_chop():
             ChopBlock("testing the chop block " + ChopBlock("cool tho").truncate(1).build()).format(ChopBlock.Formats.MESSAGE),
             
             {"role": "system", "content": "Previous Chat Conversation:"},
-            ChatHistoryBlock(messages).truncate(38),
+            ChatHistoryBlock(messages).truncate(35),
         ]
     )
     
@@ -39,7 +39,7 @@ def test_build_2():
         "content": "testing the chop block Pretty",
         "messages": [
             {"role": "system", "content": "Pretty Weird Stuff"},
-            {"role": "user", "content": "I need help with"},
+            {"role": "user", "content": "I need help with this cool stuff please"},
             {"role": "assistant", "content": "Sure! What specific account settings do you need help with?"},
         ]
     }
@@ -49,7 +49,7 @@ def test_build_2():
         "content": "testing the chop block " + ChopBlock("Pretty Weird Stuff").truncate(1).build(),
         "messages": [
             {"role": "system", "content": "Pretty Weird Stuff"},
-            ChatHistoryBlock(messages).truncate(38),
+            ChatHistoryBlock(messages).truncate(35),
         ]
     })
 
