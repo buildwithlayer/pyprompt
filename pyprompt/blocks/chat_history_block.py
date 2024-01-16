@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Callable, List, Optional, Tuple, TypedDict, Union
 
-from .block import Block, Buildables
+from .decontructable_block import DeconstructableBlock
+from .block import Block
 from enum import Enum
 
 __all__ = ["ChatHistoryBlock", "Message", "Role", "MessageTruncator"]
@@ -19,7 +20,7 @@ class Message(TypedDict):
 MessageTruncator = Callable[[int], Tuple[List[Message], int]]
 
 
-class ChatHistoryBlock(Block[List[Message]]):
+class ChatHistoryBlock(DeconstructableBlock[List[Message]]):
     """Represents a block that displays chat history."""
     
     class Formats(Enum):
@@ -45,6 +46,7 @@ class ChatHistoryBlock(Block[List[Message]]):
             
         return self
     
+    Block._queue
     def truncate(
             self,
             max_tokens: int,
@@ -73,15 +75,10 @@ class ChatHistoryBlock(Block[List[Message]]):
 
         messages = self.data.copy()
         
-        count = self._count_messages_tokens(messages)
-        
         while self._count_messages_tokens(messages) > max_tokens:
             messages.pop(0)
             
         total_tokens = self._count_messages_tokens(messages)
-
-        if len(messages) == 1:
-            pass
         
         return messages, total_tokens
         

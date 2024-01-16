@@ -24,7 +24,7 @@ def test_build_prompt_chop():
     prompt = Builder().build(
         [
             {"role": "system", "content": ChopBlock("testing the chop block")},
-            ChopBlock("testing the chop block " + ChopBlock("cool tho").truncate(1).build()).format(ChopBlock.Formats.MESSAGE),
+            ChopBlock("testing the chop block " + ChopBlock("cool tho").set_tokenizer().truncate(1).build()).format(ChopBlock.Formats.MESSAGE),
             
             {"role": "system", "content": "Previous Chat Conversation:"},
             ChatHistoryBlock(messages).truncate(35),
@@ -46,7 +46,7 @@ def test_build_2():
 
     # Create an instance of the PromptBuilder
     prompt = Builder().build({
-        "content": "testing the chop block " + ChopBlock("Pretty Weird Stuff").truncate(1).build(),
+        "content": "testing the chop block " + ChopBlock("Pretty Weird Stuff").set_tokenizer().truncate(1).build(),
         "messages": [
             {"role": "system", "content": "Pretty Weird Stuff"},
             ChatHistoryBlock(messages).truncate(35),

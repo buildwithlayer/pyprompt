@@ -3,6 +3,10 @@ from pyexpat.errors import messages
 from typing import Tuple, Optional
 from enum import Enum
 
+from tiktoken.registry import get_encoding as get_encoding
+
+from pyprompt.tokenizers import Tokenizer
+
 from .block import Block
 from ..tokenizers import Tokenizer
 
@@ -30,8 +34,8 @@ class ChopBlock(Block[str]):
         STRING = "string"
         MESSAGE = "message"
 
-    def __init__(self, data: str, tokenizer: Optional[Tokenizer] = None):
-        super().__init__(data, tokenizer)
+    def __init__(self, data: str):
+        super().__init__(data)
 
     def format(self, to: ChopBlock.Formats = None, **kwargs) -> ChopBlock:
         """
@@ -74,3 +78,6 @@ class ChopBlock(Block[str]):
         self.data = self.tokenizer.decode(encoded)
 
         return self
+    
+    def set_tokenizer(self, *args) -> ChopBlock:
+        return super().set_tokenizer(*args)

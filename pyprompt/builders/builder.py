@@ -1,7 +1,8 @@
 from typing import List
 
 import tiktoken
-from ..blocks import Block, Buildables, ChatHistoryBlock, ChopBlock
+
+from ..blocks import Block, Buildables, ChatHistoryBlock, ChopBlock, DeconstructableBlock
 from ..tokenizers import Tokenizer
 
 __all__ = ["Builder"]
@@ -18,8 +19,8 @@ class Builder:
     def _build_list(self, T: List[Buildables]):
         lst = []
         for _, item in enumerate(T):
-            if isinstance(item, ChatHistoryBlock):
-                messages = item.build()
+            if isinstance(item, DeconstructableBlock):
+                messages = item.set_tokenizer(self.tokenizer).build()
             
                 lst.extend([self.build(m) for m in messages])
             else:
@@ -29,12 +30,13 @@ class Builder:
     
 
     def build(self, T: Buildables) -> Buildables:
+        
         if isinstance(T, list):
             return self._build_list(T)
         elif isinstance(T, dict):
             return {self.build(key): self.build(value) for key, value in T.items()}
         elif isinstance(T, Block):
-            return self.build(T.build())
+            return self.build(T.set_tokenizer(self.tokenizer).build())
         elif isinstance(T, str):
             return T
         else:

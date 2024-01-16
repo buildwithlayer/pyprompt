@@ -21,15 +21,12 @@ class Block(Generic[T]):
         build() -> Buildables: Builds the block and returns the buildables.
     """
 
-    def __init__(self, data: T, tokenizer: Optional[Tokenizer] = None):
+    def __init__(self, data: T):
         self.data = data
         self._original_data = data
         self._has_been_formatted = False
         self._q = []
-
-        if tokenizer is None:
-            tokenizer = tiktoken.get_encoding("cl100k_base")
-        self.tokenizer = tokenizer
+        self.tokenizer = None
         
     def format(self, to: str = None, **kwargs) -> Block[T]:
         self._has_been_formatted = True
@@ -40,6 +37,12 @@ class Block(Generic[T]):
             self._q.append((func, args, kwargs))
         return wrapper
 
+    def set_tokenizer(self, tokenizer: Tokenizer = tiktoken.get_encoding("cl100k_base")) -> Block[T]:
+        """ Usually called by the builder """
+        if self.tokenizer is None:
+            self.tokenizer = tokenizer
+        return self
+        
     def build(self) -> Buildables:
         """
         Builds the block and returns the buildables.
@@ -47,6 +50,9 @@ class Block(Generic[T]):
         Returns:
             Buildables: The buildables generated from the block.
         """
+        
+        if self.tokenizer is None:
+            raise ValueError("Tokenizer must be set before building")
         
         # Apply all queued methods to the data
         for func, args, kwargs in self._q:
