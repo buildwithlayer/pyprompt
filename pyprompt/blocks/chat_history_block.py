@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import Callable, List, Optional, Tuple, TypedDict, Union
 
-from pyprompt.blocks.block import Buildables
-from .block import Block
+from .block import Block, Buildables
 from enum import Enum
 
 __all__ = ["ChatHistoryBlock", "Message", "Role", "MessageTruncator"]
@@ -65,9 +64,12 @@ class ChatHistoryBlock(Block[List[Message]]):
     
     def _count_messages_tokens(self, messages: List[Message]):
         stringified = [f"{message['role']}: {message['content']}" for message in messages]
+        pass
         encoded = [self.tokenizer.encode(message) for message in stringified]
-        
-        return sum([len(tokens) for tokens in encoded])
+        pass
+        sumed = sum([len(tokens) for tokens in encoded])
+        pass
+        return sumed
 
     def _simple_truncate(self, max_tokens: int) -> Tuple[List[Message], int]:
         total_tokens = 0
@@ -76,7 +78,12 @@ class ChatHistoryBlock(Block[List[Message]]):
         
         while self._count_messages_tokens(messages) > max_tokens:
             messages.pop(0)
+            
+        total_tokens = self._count_messages_tokens(messages)
 
+        if len(messages) == 1:
+            pass
+        
         return messages, total_tokens
         
     def _summary_truncate(self, max_tokens: int) -> Tuple[List[Message], int]:

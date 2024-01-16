@@ -1,21 +1,31 @@
 from typing import List
-from pyprompt.blocks.chat_history_block import ChatHistoryBlock
-from ..blocks import Block, Buildables
+
+import tiktoken
+from blocks import Block, Buildables, ChatHistoryBlock
+from tokenizers import Tokenizer
+
 
 __all__ = ["Builder"]
 
+class Allocator:
+    pass
+
 class Builder:
     
+    def __init__(self, allocator: Allocator = None, tokenizer: Tokenizer = tiktoken.get_encoding("cl100k_base")) -> None:
+        self.tokenizer = tokenizer
+        self.allocator = allocator
     
     def _build_list(self, T: List[Buildables]):
         lst = []
         for _, item in enumerate(T):
             if isinstance(item, ChatHistoryBlock):
                 messages = item.build()
+            
                 lst.extend([self.build(m) for m in messages])
             else:
                 lst.append(self.build(item))
-                
+             
         return lst
     
 

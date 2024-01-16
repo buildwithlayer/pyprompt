@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Dict, Generic, List, Optional, TypeVar, Union
 import tiktoken
 
-from ..tokenizers import Tokenizer
+from tokenizers import Tokenizer
 
 __all__ = ["Block", "Buildables"]
 

@@ -1,9 +1,10 @@
 from __future__ import annotations
+from pyexpat.errors import messages
 from typing import Tuple, Optional
 from enum import Enum
 
 from .block import Block, Buildables
-from ..tokenizers import Tokenizer
+from tokenizers import Tokenizer
 
 __all__ = ["ChopBlock"]
 
@@ -47,15 +48,15 @@ class ChopBlock(Block[str]):
             >>> block = ChopBlock("Hello, world!")
             >>> block.truncate(50).format(ChopBlock.Formats.MESSAGE, role="user")
         """
-        
+
         if to == None:
             to = ChopBlock.Formats.STRING
-        
+
         if to == ChopBlock.Formats.STRING:
             self.data = str(self.data)
         elif to == ChopBlock.Formats.MESSAGE:
             self.data = {"role": kwargs.get("role", "user"), "content": self.data}
-            
+
         return self
 
     # Block._check_formatted
@@ -65,13 +66,11 @@ class ChopBlock(Block[str]):
         """
         encoded = self.tokenizer.encode(self.data)
 
-        
-
         if kwargs.get("chop_type", ChopType.END) == ChopType.END:
             encoded = encoded[:max_tokens]
         else:
             encoded = encoded[-max_tokens:]
 
         self.data = self.tokenizer.decode(encoded)
-        
+
         return self
