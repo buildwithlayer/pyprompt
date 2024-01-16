@@ -46,7 +46,7 @@ class ChatHistoryBlock(DeconstructableBlock[List[Message]]):
             
         return self
     
-    Block._queue
+    @Block._queue
     def truncate(
             self,
             max_tokens: int,

@@ -57,7 +57,6 @@ def test_build_2():
     assert prompt == prompt_solution
     
 def test_do_thing():
-    encoder = tiktoken.get_encoding("cl100k_base")
+    prompt = Builder().build([ChopBlock("Pretty Weird Stuff").truncate(1)])
     
-    num = len(encoder.encode("user: I need help with"))
-    pass
+    assert prompt == ["Pretty"]

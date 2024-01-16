@@ -28,14 +28,15 @@ class Block(Generic[T]):
         self._q = []
         self.tokenizer = None
         
-    def format(self, to: str = None, **kwargs) -> Block[T]:
-        self._has_been_formatted = True
-    
     @staticmethod
     def _queue(func):
         def wrapper(self, *args, **kwargs):
             self._q.append((func, args, kwargs))
+            return self
         return wrapper
+
+    def format(self, to: str = None, **kwargs) -> Block[T]:
+        self._has_been_formatted = True
 
     def set_tokenizer(self, tokenizer: Tokenizer = tiktoken.get_encoding("cl100k_base")) -> Block[T]:
         """ Usually called by the builder """

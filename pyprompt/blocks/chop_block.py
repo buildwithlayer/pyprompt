@@ -63,7 +63,7 @@ class ChopBlock(Block[str]):
 
         return self
 
-    Block._queue
+    @Block._queue
     def truncate(self, max_tokens: int, **kwargs) -> ChopBlock:
         """
         Truncates the data in the block to a maximum number of tokens.
