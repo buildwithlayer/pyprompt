@@ -1,52 +1,65 @@
+from __future__ import annotations
 
-from typing import Tuple, Optional
-from enum import Enum
+from typing import Optional, Type, Tuple
 
+from pyprompt.common.json import JSON_ARRAY, JSON_TYPE
+from pyprompt.tokenizers import Tokenizer
 from .block import Block
-from ..types import Wrap
-from ..tokenizers import Tokenizer
 
-__all__ = ["ChopBlock"]
-
-class ChopType(str, Enum):
-    START = "start"
-    END = "end"
+__all__ = ("ChopBlock",)
 
 
-class ChopBlock(Block[str]):
-    """A block that chops data to a specified length."""
+class ChopBlock(Block):
+    def _build_str(self, data: str) -> str:
+        return data
 
-    def __init__(self, name: str, data: str, tokenizer: Optional[Tokenizer] = None, chop_type: ChopType = ChopType.END):
-        """
-        Initialize a ChopBlock instance.
+    def _build_array(self, data: str) -> JSON_ARRAY:
+        return [data]
 
-        Args:
-            data (str): The data to be chopped.
-            chop_type (ChopType): The type of chopping to be performed (default: ChopType.END).
-            **kwargs: Additional keyword arguments to be passed to the super class.
-        """
-        super().__init__(name, data, tokenizer)
-        self.chop_type = chop_type
+    def build_json(self, parent_type: Optional[Type], *args) -> JSON_TYPE:
+        data = self._parse_data_from_args(*args)
 
-    def format(self, data: Optional[str] = None, wrap: Wrap = False) -> str:
-        if data is None:
-            data = self.data
-            
-        if wrap is True:
-            wrap = ("", "\n")
-        
-        wrapped = self._wrap(data, wrap)
-        
-        return wrapped
-    
-    def truncate(self, max_tokens: int, wrap: Wrap = False) -> Tuple[str, int]:
-        
-        
-        encoded = self.tokenizer.encode(self._wrap(self.data, wrap=wrap))
-        if self.chop_type == ChopType.END:
-            encoded = encoded[:max_tokens]
+        if parent_type is list:
+            return self._build_array(data)
         else:
-            encoded = encoded[-max_tokens:]
+            return self._build_str(data)
 
-        decoded = self.tokenizer.decode(encoded)
-        return decoded, len(encoded)
+    def reduce(
+            self,
+            tokenizer: Tokenizer,
+            parent_type: Optional[Type],
+            *args,
+            goal: Optional[int] = None
+    ) -> Tuple[str, int]:
+        data = self._parse_data_from_args(*args)
+
+        built_data = self.build_json(parent_type, data)
+        built_data_size = self._size(tokenizer, built_data)
+
+        if goal is None:
+            goal = built_data_size - 1
+
+        if built_data_size <= goal:
+            return data, built_data_size
+
+        difference = built_data_size - goal
+        raw_data_size = self._size(tokenizer, data)
+
+        if raw_data_size < difference:
+            raise ValueError(f"Cannot reduce data [{data}] enough to reach goal [{goal}]")
+
+        raw_data_tokens = tokenizer.encode(data)
+        new_data = tokenizer.decode(raw_data_tokens[:-difference])
+
+        return new_data, len(raw_data_tokens) - difference
+
+    @staticmethod
+    def _parse_data_from_args(*args) -> str:
+        if len(args) != 1:
+            raise ValueError(f"Expected 1 argument, got {len(args)}")
+
+        data = args[0]
+        if not isinstance(data, str):
+            raise TypeError(f"Data must be str, not: {type(data)}")
+
+        return data
