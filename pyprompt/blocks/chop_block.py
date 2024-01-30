@@ -34,7 +34,7 @@ class ChopBlock(Block):
         data = self._parse_data_from_args(*args)
 
         built_data = self.build_json(parent_type, data)
-        built_data_size = self._size(tokenizer, built_data)
+        built_data_size = self.size(tokenizer, built_data)
 
         if goal is None:
             goal = built_data_size - 1
@@ -43,10 +43,10 @@ class ChopBlock(Block):
             return data, built_data_size
 
         difference = built_data_size - goal
-        raw_data_size = self._size(tokenizer, data)
+        raw_data_size = self.size(tokenizer, data)
 
         if raw_data_size < difference:
-            raise ValueError(f"Cannot reduce data [{data}] enough to reach goal [{goal}]")
+            return "", 0
 
         raw_data_tokens = tokenizer.encode(data)
         new_data = tokenizer.decode(raw_data_tokens[:-difference])

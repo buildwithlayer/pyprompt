@@ -53,10 +53,6 @@ class Block:
         else:
             return self._build_dict(*args)
 
-    def size(self, tokenizer: Tokenizer, parent_type: Optional[Type], *args) -> int:
-        built_data = self.build_json(parent_type, *args)
-        return self._size(tokenizer, built_data)
-
     def reduce(
             self,
             tokenizer: Tokenizer,
@@ -67,16 +63,24 @@ class Block:
         raise NotImplementedError
 
     @staticmethod
-    def _size(tokenizer: Tokenizer, built_data: Union[str, JSON_ARRAY, JSON_OBJECT]) -> int:
+    def size(tokenizer: Tokenizer, built_data: Union[str, JSON_ARRAY, JSON_OBJECT]) -> int:
         if isinstance(built_data, str):
             return len(tokenizer.encode(built_data))
         elif isinstance(built_data, list):
-            return sum(Block._size(tokenizer, datum) for datum in built_data)
+            return sum(Block.size(tokenizer, datum) for datum in built_data)
         elif isinstance(built_data, dict):
-            return sum(Block._size(tokenizer, datum) for datum in built_data.values())
+            return sum(Block.size(tokenizer, datum) for datum in built_data.values())
         else:
             raise TypeError(f"Unexpected type {type(built_data)}")
 
     @staticmethod
     def _parse_data_from_args(*args) -> Any:
         raise NotImplementedError
+
+    def __eq__(self, other: Block) -> bool:
+        return all([
+            type(self) is type(other),
+            self.name == other.name,
+            self.minsize == other.minsize,
+            self.maxsize == other.maxsize,
+        ])

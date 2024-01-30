@@ -43,15 +43,15 @@ class MessagesBlock(Block):
             goal: int
     ) -> Tuple[List[Message], int]:
         built_data = self.build_json(parent_type, messages)
-        built_data_size = self._size(tokenizer, built_data)
+        built_data_size = self.size(tokenizer, built_data)
 
         while built_data_size > goal:
             if len(messages) == 1:
-                raise ValueError(f"Cannot reduce messages [{messages}] enough to reach goal [{goal}]")
+                return messages, built_data_size
 
             messages = [*messages][1:]
             built_data = self.build_json(parent_type, messages)
-            built_data_size = self._size(tokenizer, built_data)
+            built_data_size = self.size(tokenizer, built_data)
 
         return messages, built_data_size
 
@@ -65,7 +65,7 @@ class MessagesBlock(Block):
         messages = self._parse_data_from_args(*args)
 
         built_data = self.build_json(parent_type, messages)
-        built_data_size = self._size(tokenizer, built_data)
+        built_data_size = self.size(tokenizer, built_data)
 
         if goal is None:
             goal = built_data_size - 1
@@ -102,3 +102,6 @@ class MessagesBlock(Block):
                 raise TypeError(f"Messages must be a list of dicts or Messages, not: {type(message)}")
 
         return messages
+
+    def __eq__(self, other: MessagesBlock) -> bool:
+        return super().__eq__(other) and self.reduce_type == other.reduce_type

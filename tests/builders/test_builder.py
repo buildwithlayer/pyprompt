@@ -1,30 +1,10 @@
-from inspect import isclass
-
 import pytest
 
 from allocators import Allocator
 from pyprompt.blocks import *
 from pyprompt.builders import Builder
-
-
-def assert_parsed(actual, expected):
-    if actual is None or expected is None:
-        assert actual == expected
-    else:
-        if isinstance(actual, dict):
-            assert type(actual) is type(expected)
-
-            actual_keys = actual.keys()
-            expected_keys = expected.keys()
-            assert set(actual_keys) == set(expected_keys)
-
-            for key, actual_value in actual.items():
-                expected_value = expected[key]
-                assert_parsed(actual_value, expected_value)
-        elif isclass(actual) and issubclass(actual, Block):
-            assert issubclass(actual, expected)
-        else:
-            assert actual == expected
+from pyprompt.builders.trees import TemplateTreeNode
+from pyprompt.tokenizers import TiktokenTokenizer
 
 
 @pytest.mark.parametrize("template, expected", [
@@ -33,14 +13,20 @@ def assert_parsed(actual, expected):
     ("Hello", None),
     (["hello", "hello", "hello"], None),
     ({"hello": "world"}, None),
-    (Block(name="test_block"), {"test_block": {"block_type": Block, "path": []}}),
+    (Block(name="test_block"), {"test_block": TemplateTreeNode(block=Block(name="test_block"), path=[])}),
     (
             [Block(name="test_block_0"), Block(name="test_block_1")],
-            {"test_block_0": {"block_type": Block, "path": [0]}, "test_block_1": {"block_type": Block, "path": [1]}},
+            {
+                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=[0]),
+                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=[1]),
+            },
     ),
     (
             {0: Block(name="test_block_0"), 1: Block(name="test_block_1")},
-            {"test_block_0": {"block_type": Block, "path": [0]}, "test_block_1": {"block_type": Block, "path": [1]}},
+            {
+                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=[0]),
+                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=[1]),
+            },
     ),
     (
             {
@@ -53,32 +39,32 @@ def assert_parsed(actual, expected):
                     "hello": Block(name="test_block_1"),
                 },
             }, {
-                "test_block_0": {"block_type": Block, "path": ["another", 1]},
-                "test_block_1": {"block_type": Block, "path": ["final", "hello"]},
+                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=["another", 1]),
+                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=["final", "hello"]),
             },
     ),
-    (f"Hello {Block(name='name')}", {"name": {"block_type": Block, "path": [0]}})
+    (f"Hello {Block(name='name')}", {"name": TemplateTreeNode(block=Block(name="name"), path=[0])})
 ])
 def test_parse(template, expected):
     actual = Builder._parse(template)
-    assert_parsed(actual, expected)
+    assert actual == expected
 
 
 def test_build():
     builder = Builder(
-        context_limit=0,
-        allocator=Allocator(),
+        context_limit=60,
+        allocator=Allocator(TiktokenTokenizer()),
         template={
             "messages": [
                 {"role": "system", "content": ChopBlock(name="system_prompt")},
-                MessagesBlock(name="messages", minsize=300),
+                MessagesBlock(name="messages"),
                 {
                     "role": "assistant",
-                    "content": f"Here is some additional context provided by the user: {ContextBlock(name='context', minsize=200)}",
+                    "content": f"Here is some additional context provided by the user: {ContextBlock(name='context')}",
                 },
             ],
             "tools": [
-                ToolsBlock(name="tools", minsize=300),
+                ToolsBlock(name="tools", minsize=100),
             ],
         }
     )
@@ -106,10 +92,6 @@ def test_build():
             {
                 "role": "system",
                 "content": "Keep your responses brief.",
-            },
-            {
-                "role": "assistant",
-                "content": "How can I help you today?",
             },
             {
                 "role": "user",

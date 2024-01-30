@@ -34,7 +34,7 @@ class ContextBlock(Block):
         contexts = self._parse_data_from_args(*args)
 
         built_data = self.build_json(parent_type, contexts)
-        built_data_size = self._size(tokenizer, built_data)
+        built_data_size = self.size(tokenizer, built_data)
 
         if goal is None:
             goal = built_data_size - 1
@@ -44,11 +44,11 @@ class ContextBlock(Block):
 
         while built_data_size > goal:
             if len(contexts) == 1:
-                raise ValueError(f"Cannot reduce contexts [{contexts}] enough to reach goal [{goal}]")
+                return contexts, built_data_size
 
             contexts = [*contexts][:-1]
             built_data = self.build_json(parent_type, contexts)
-            built_data_size = self._size(tokenizer, built_data)
+            built_data_size = self.size(tokenizer, built_data)
 
         return contexts, built_data_size
 
