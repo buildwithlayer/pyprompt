@@ -60,7 +60,8 @@ def test_build_json(
 def test_size(parent_type: Optional[Type], messages: List[Union[Message, dict]], expected: int):
     messages_block = MessagesBlock("test_messages_block")
     tokenizer = TiktokenTokenizer()
-    actual = messages_block.size(tokenizer, parent_type, *messages)
+    built_data = messages_block.build_json(parent_type, *messages)
+    actual = messages_block.size(tokenizer, built_data)
     assert actual == expected
 
 

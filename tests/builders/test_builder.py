@@ -1,6 +1,6 @@
 import pytest
 
-from allocators import Allocator
+from pyprompt.allocators import Allocator
 from pyprompt.blocks import *
 from pyprompt.builders import Builder
 from pyprompt.builders.trees import TemplateTreeNode

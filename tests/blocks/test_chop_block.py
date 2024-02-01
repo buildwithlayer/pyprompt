@@ -40,7 +40,8 @@ def test_build_json(parent_type: Optional[Type], data: str, expected: Union[str,
 def test_size(parent_type: Optional[Type], data: str, expected: int):
     chop_block = ChopBlock("test_chop_block")
     tokenizer = TiktokenTokenizer()
-    actual = chop_block.size(tokenizer, parent_type, data)
+    built_data = chop_block.build_json(parent_type, data)
+    actual = chop_block.size(tokenizer, built_data)
     assert actual == expected
 
 

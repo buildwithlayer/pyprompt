@@ -60,7 +60,8 @@ def test_build_json(parent_type: Optional[Type], contexts: List[str], expected: 
 def test_size(parent_type: Optional[Type], contexts: List[str], expected: int):
     context_block = ContextBlock("test_context_block")
     tokenizer = TiktokenTokenizer()
-    actual = context_block.size(tokenizer, parent_type, *contexts)
+    built_data = context_block.build_json(parent_type, *contexts)
+    actual = context_block.size(tokenizer, built_data)
     assert actual == expected
 
 
