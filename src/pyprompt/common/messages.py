@@ -127,6 +127,13 @@ def message_from_dict(message_dict: dict) -> Message:
     elif role == MessageRole.USER:
         return UserMessage(**message_dict)
     elif role == MessageRole.ASSISTANT:
+        tool_calls = message_dict.pop("tool_calls", None)
+        if tool_calls is not None:
+            new_tool_calls = []
+            for tool_call_dict in tool_calls:
+                tool_call_dict["function"] = ToolCall.Function(**tool_call_dict["function"])
+                new_tool_calls.append(ToolCall(**tool_call_dict))
+            message_dict["tool_calls"] = new_tool_calls
         return AssistantMessage(**message_dict)
     elif role == MessageRole.TOOL:
         return ToolMessage(**message_dict)
