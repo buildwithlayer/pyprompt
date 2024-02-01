@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from enum import Enum
 from typing import List, Optional, Type, Tuple
 
@@ -90,6 +91,8 @@ class MessagesBlock(Block):
                 messages = [args[0]]
         else:
             messages = list(args)
+
+        messages = deepcopy(messages)
 
         if not isinstance(messages, list):
             raise TypeError(f"Messages must be a list of dicts or Messages, not: {type(messages)}")

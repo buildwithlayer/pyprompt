@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import List, Optional, Type, Tuple
 
 from pyprompt.common.json import JSON_ARRAY, JSON_TYPE
@@ -63,6 +64,8 @@ class ContextBlock(Block):
                 contexts = [args[0]]
         else:
             contexts = list(args)
+
+        contexts = deepcopy(contexts)
 
         if not isinstance(contexts, list) or not all(isinstance(c, str) for c in contexts):
             raise TypeError(f"Contexts must be a list of str, not: {type(contexts)}")

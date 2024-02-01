@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import List, Optional, Type, Tuple
 
 from pyprompt.common.json import JSON_TYPE
@@ -46,6 +47,8 @@ class ToolsBlock(Block):
                 tools = [args[0]]
         else:
             tools = args
+
+        tools = deepcopy(tools)
 
         if not isinstance(tools, list):
             raise TypeError(f"Tools must be a list of dicts or Tools, not: {type(tools)}")
