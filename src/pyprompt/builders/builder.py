@@ -62,7 +62,8 @@ class Builder:
 
             start_size += node.size
 
-        self.allocator.reduce(size_tree, start_size - actual_context_limit)
+        if start_size > actual_context_limit:
+            self.allocator.reduce(size_tree, start_size - actual_context_limit)
 
         template = deepcopy(self.template)
         for block_name, block_map_value in self.template_tree.items():

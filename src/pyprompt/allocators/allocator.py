@@ -1,13 +1,14 @@
 from pyprompt.blocks import Block
 from pyprompt.common.json import JSON_TYPE
 from pyprompt.tokenizers import Tokenizer
+from pyprompt.tokenizers.tiktoken_tokenizer import TiktokenTokenizer
 from .trees import *
 
 __all__ = ("Allocator",)
 
 
 class Allocator:
-    def __init__(self, tokenizer: Tokenizer):
+    def __init__(self, tokenizer: Tokenizer = TiktokenTokenizer()):
         self.tokenizer = tokenizer
 
     def get_template_size(self, template: JSON_TYPE) -> int:

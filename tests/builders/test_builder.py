@@ -1,3 +1,5 @@
+from pyexpat.errors import messages
+import sys
 import pytest
 
 from pyprompt.allocators import Allocator
@@ -7,28 +9,41 @@ from pyprompt.builders.trees import TemplateTreeNode
 from pyprompt.tokenizers import TiktokenTokenizer
 
 
-@pytest.mark.parametrize("template, expected", [
-    (1, None),
-    (2.5, None),
-    ("Hello", None),
-    (["hello", "hello", "hello"], None),
-    ({"hello": "world"}, None),
-    (Block(name="test_block"), {"test_block": TemplateTreeNode(block=Block(name="test_block"), path=[])}),
-    (
+@pytest.mark.parametrize(
+    "template, expected",
+    [
+        (1, None),
+        (2.5, None),
+        ("Hello", None),
+        (["hello", "hello", "hello"], None),
+        ({"hello": "world"}, None),
+        (
+            Block(name="test_block"),
+            {"test_block": TemplateTreeNode(block=Block(name="test_block"), path=[])},
+        ),
+        (
             [Block(name="test_block_0"), Block(name="test_block_1")],
             {
-                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=[0]),
-                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=[1]),
+                "test_block_0": TemplateTreeNode(
+                    block=Block(name="test_block_0"), path=[0]
+                ),
+                "test_block_1": TemplateTreeNode(
+                    block=Block(name="test_block_1"), path=[1]
+                ),
             },
-    ),
-    (
+        ),
+        (
             {0: Block(name="test_block_0"), 1: Block(name="test_block_1")},
             {
-                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=[0]),
-                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=[1]),
+                "test_block_0": TemplateTreeNode(
+                    block=Block(name="test_block_0"), path=[0]
+                ),
+                "test_block_1": TemplateTreeNode(
+                    block=Block(name="test_block_1"), path=[1]
+                ),
             },
-    ),
-    (
+        ),
+        (
             {
                 "hello": "world",
                 "another": [
@@ -38,13 +53,22 @@ from pyprompt.tokenizers import TiktokenTokenizer
                 "final": {
                     "hello": Block(name="test_block_1"),
                 },
-            }, {
-                "test_block_0": TemplateTreeNode(block=Block(name="test_block_0"), path=["another", 1]),
-                "test_block_1": TemplateTreeNode(block=Block(name="test_block_1"), path=["final", "hello"]),
             },
-    ),
-    (f"Hello {Block(name='name')}", {"name": TemplateTreeNode(block=Block(name="name"), path=[0])})
-])
+            {
+                "test_block_0": TemplateTreeNode(
+                    block=Block(name="test_block_0"), path=["another", 1]
+                ),
+                "test_block_1": TemplateTreeNode(
+                    block=Block(name="test_block_1"), path=["final", "hello"]
+                ),
+            },
+        ),
+        (
+            f"Hello {Block(name='name')}",
+            {"name": TemplateTreeNode(block=Block(name="name"), path=[0])},
+        ),
+    ],
+)
 def test_parse(template, expected):
     actual = Builder._parse(template)
     assert actual == expected
@@ -53,7 +77,7 @@ def test_parse(template, expected):
 def test_build():
     builder = Builder(
         context_limit=60,
-        allocator=Allocator(TiktokenTokenizer()),
+        allocator=Allocator(),
         template={
             "messages": [
                 {"role": "system", "content": ChopBlock(name="system_prompt")},
@@ -66,7 +90,7 @@ def test_build():
             "tools": [
                 ToolsBlock(name="tools", minsize=100),
             ],
-        }
+        },
     )
 
     prompt = builder.build(
@@ -81,9 +105,7 @@ def test_build():
                 "content": "What is the weather today?",
             },
         ],
-        context=[
-            "The temperature outside is 60 degrees Fahrenheit."
-        ],
+        context=["The temperature outside is 60 degrees Fahrenheit."],
         tools=[],
     )
 
@@ -104,3 +126,51 @@ def test_build():
         ],
         "tools": [],
     }
+
+
+def test_list_build():
+    builder = Builder(
+        context_limit=1000,
+        allocator=Allocator(),
+        template=[
+            ChopBlock(name="system_prompt"),
+            f"Here is some additional context provided by the user: {ContextBlock(name='context')}",
+            MessagesBlock(name="messages"),
+        ],
+    )
+
+    prompt = builder.build(
+        system_prompt="Keep your responses brief.",
+        context=["The temperature outside is 60 degrees Fahrenheit."],
+        messages=[
+            {"role": "assistant", "content": "How can I help you today?"},
+            {"role": "user", "content": "What is the weather today?"},
+            {"role": "assistant", "content": "The weather today is 60 degrees Fahrenheit."},
+        ],
+    )
+
+    assert (
+        prompt
+        == [
+            "Keep your responses brief.",
+            "Here is some additional context provided by the user: The temperature outside is 60 degrees Fahrenheit.",
+            {"role": "assistant", "content": "How can I help you today?"},
+            {"role": "user", "content": "What is the weather today?"},
+            {"role": "assistant", "content": "The weather today is 60 degrees Fahrenheit."},
+        ]
+    )
+
+
+def test_lonely_fstring_build():
+    builder = Builder(
+        context_limit=60,
+        allocator=Allocator(),
+        template=f"Here is some additional context provided by the user: {ContextBlock(name='context')}",
+    )
+
+    prompt = builder.build(context=["The temperature outside is 60 degrees Fahrenheit."])
+
+    assert (
+        prompt
+        == "Here is some additional context provided by the user: The temperature outside is 60 degrees Fahrenheit."
+    )
