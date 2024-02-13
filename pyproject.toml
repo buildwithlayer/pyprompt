@@ -1,8 +1,3 @@
-[tool.pytest.ini_options]
-pythonpath = [
-  "pyprompt"
-]
-
 [tool.poetry]
 name = "pyprompt"
 version = "0.1.0"
@@ -13,6 +8,7 @@ authors = [
 ]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "pyprompt", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
