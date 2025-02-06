@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "pyprompt"
-version = "0.1.0"
+version = "0.3.0"
 description = "Validation for LLM prompts."
 authors = [
-  "Chris Vincens <chrisv@buildwithlayer.com>",
+  "Andrew Hamilton <andrewh@buildwithlayer.com>",
   "Gavyn Partlow <gavynp@buildwithlayer.com>",
 ]
 license = "MIT"
@@ -12,8 +12,8 @@ packages = [{include = "pyprompt", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest = "^8.0.0"
-tiktoken = "^0.5.2"
+pytest = "^8.3.4"
+tiktoken = "^0.8.0"
 
 
 [build-system]
