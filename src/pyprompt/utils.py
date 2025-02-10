@@ -1,4 +1,4 @@
-from typing import Callable, Union, Generator
+from typing import Callable, Union, Generator, Any
 
 __all__ = (
     "RenderMap",
@@ -6,6 +6,7 @@ __all__ = (
     "BudgetMap",
     "EncodingFunc",
     "DecodingFunc",
+    "GrowCallback",
     "orphan_child_from_token_map",
     "update_token_map",
     "create_render_map",
@@ -18,6 +19,7 @@ TokenMap = dict[int, Union[list[int], 'TokenMap']]
 BudgetMap = dict[int, Union[int | float, 'BudgetMap']]
 EncodingFunc = Callable[[str], list[int]]
 DecodingFunc = Callable[[list[int]], str]
+GrowCallback = Callable[["PromptElement", EncodingFunc, DecodingFunc, Any | None], tuple[TokenMap | None, Any | None]]
 
 
 def orphan_child_from_token_map(token_map: TokenMap, descendant_indices: list[int]) -> tuple[TokenMap, TokenMap | list[int]]:

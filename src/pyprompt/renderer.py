@@ -29,5 +29,15 @@ def render_prompt(
         if token_map is None:
             raise ValueError("Could not prune prompt")
 
+    token_count = prompt.get_token_count(token_map)
+    grow_budget = total_budget - token_count
+    if grow_budget > 0:
+        token_map, _ = prompt.grow(
+            grow_budget,
+            token_map,
+            encoding_func,
+            decoding_func,
+        )
+
     render_map = create_render_map(token_map, decoding_func)
     return list(prompt.generate_messages(render_map))

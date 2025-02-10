@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from sys import maxsize
-from typing import Generator, TypeVar, Union
+from typing import Generator, Callable, Any
 
 from .utils import (
     EncodingFunc,
     DecodingFunc,
+    GrowCallback,
     RenderMap,
     TokenMap,
     is_in_token_map,
@@ -14,8 +15,6 @@ from .utils import (
 )
 
 __all__ = ("PromptElement",)
-
-M = TypeVar("M", bound=Union[TokenMap, RenderMap])
 
 
 class PromptElement:
@@ -40,11 +39,15 @@ class PromptElement:
         priority: int = maxsize,
         pass_priority: bool = False,
         reserve: int | float | None = None,
+        grow_ratio: int | float = 1,
+        grow_callback: GrowCallback | None = None,
     ):
         self.children = children
         self.priority = priority
         self.pass_priority = pass_priority
         self.reserve = reserve
+        self.grow_ratio = grow_ratio
+        self.grow_callback = grow_callback
 
         self._priority_chain = None
         self._priorities = None
@@ -222,6 +225,70 @@ class PromptElement:
                 return token_map
 
         return None
+
+    def can_grow(self) -> bool:
+        for child in self.children:
+            if isinstance(child, PromptElement) and child.can_grow():
+                return True
+        return self.grow_callback is not None
+
+    def get_grow_sum(self) -> float:
+        total = 0.0
+        for child in self.children:
+            if isinstance(child, PromptElement):
+                total += child.get_grow_sum()
+        if self.grow_callback is not None:
+            total += float(self.grow_ratio)
+        return total
+
+    def grow(
+        self,
+        grow_budget: int,
+        token_map: TokenMap,
+        encoding_func: EncodingFunc,
+        decoding_func: DecodingFunc,
+    ) -> tuple[TokenMap, Any | None]:
+        if not self.can_grow():
+            return token_map, None
+
+        if self.grow_callback is not None:
+            starting_token_count = self.get_token_count(token_map)
+            goal_token_count = starting_token_count + grow_budget
+
+            token_count = starting_token_count
+            grow_state = None
+            while token_count < goal_token_count:
+                new_token_map, new_grow_state = self.grow_callback(
+                    self, encoding_func, decoding_func, grow_state
+                )
+                if new_token_map is None:
+                    break
+
+                token_count = self.get_token_count(new_token_map)
+                if token_count <= goal_token_count:
+                    token_map = new_token_map
+                    grow_state = new_grow_state
+
+            return token_map, grow_state
+
+        grow_sum = self.get_grow_sum()
+        grow_part = grow_budget / grow_sum
+
+        for idx, child in enumerate(self.children):
+            if not isinstance(child, PromptElement) or not child.can_grow():
+                continue
+
+            child_grow_budget = int(child.get_grow_sum() * grow_part)
+            new_token_map, new_grow_state = child.grow(
+                child_grow_budget,
+                token_map[idx],
+                encoding_func,
+                decoding_func,
+            )
+            if new_token_map is not None:
+                token_map[idx] = new_token_map
+
+        return token_map, None
 
     def generate_messages(self, render_map: RenderMap) -> Generator[dict, None, None]:
         """
