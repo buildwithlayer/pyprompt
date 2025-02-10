@@ -157,7 +157,7 @@ def test_get_reserved():
         "Hello!",
         PromptElement("How are you, {name}?", reserve=10),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", reserve=1/5),
+            PromptElement("It is {temperature} degrees today.", reserve=1 / 5),
             "Thank you!",
         ),
     )
@@ -363,3 +363,55 @@ def test_prune_with_reserve():
 
     token_map = prompt.prune(5, token_map, encode, decode)
     assert token_map is None
+
+
+def test_grow():
+    def grow_cb(element, encoding_func, decoding_func, grow_state):
+        if grow_state is None:
+            grow_state = 2
+        else:
+            grow_state += 1
+
+        parts = []
+        for i in range(1, grow_state + 1):
+            parts.append("Hello" + "!" * i)
+        content = " ".join(parts)
+
+        return {0: encoding_func(content)}, grow_state
+
+    prompt = PromptElement(
+        "Hello!",
+        grow_callback=grow_cb,
+    )
+    token_map, final_grow_state = prompt.grow(
+        20,
+        prompt.get_token_map(dict(), encoding_func=encode),
+        encode,
+        decode,
+    )
+    assert token_map == {
+        0: [
+            9906,
+            0,
+            22691,
+            3001,
+            22691,
+            12340,
+            22691,
+            17523,
+            22691,
+            70900,
+            22691,
+            17523,
+            3001,
+            22691,
+            17523,
+            12340,
+            22691,
+            51767,
+            22691,
+            17523,
+            70900,
+        ],
+    }
+    assert final_grow_state == 9
