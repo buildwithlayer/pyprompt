@@ -19,4 +19,5 @@ extensions = [
 # General configuration
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+html_static_path = ["_static"]
 # Remove theme specification - will use default alabaster

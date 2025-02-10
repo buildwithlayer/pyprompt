@@ -1,4 +1,6 @@
-Welcome to PyPrompt's Documentation
+.. image:: _static/images/banner.png
+   :width: 100%
+   :alt: PyPrompt Banner
 =================================
 
 PyPrompt is a Python library for building and managing LLM prompts with token-aware pruning and priority management.
