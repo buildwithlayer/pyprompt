@@ -5,12 +5,15 @@ __all__ = ("render_prompt",)
 
 
 def render_prompt(
-        prompt: PromptElement,
-        encoding_func: EncodingFunc,
-        decoding_func: DecodingFunc,
-        props: dict | None = None,
-        total_budget: int = 4096,
+    prompt: PromptElement,
+    encoding_func: EncodingFunc,
+    decoding_func: DecodingFunc,
+    props: dict | None = None,
+    total_budget: int = 4096,
 ) -> list[dict[str, str]]:
+    """
+    Renders a prompt structure into OpenAI-compatible messages while managing token budget.
+    """
     if props is None:
         props = dict()
 

@@ -5,21 +5,30 @@ __all__ = ("TextChunk",)
 
 
 class TextChunk(PromptElement):
+    """
+    Handles breakable text content with token-aware pruning capabilities.
+
+    Key features:
+    - Character-based text splitting
+    - Token-aware content pruning
+    - Maintains semantic boundaries when possible
+    """
+
     def __init__(
-            self,
-            *children: str,
-            break_on: str | None = None,
-            **kwargs,
+        self,
+        *children: str,
+        break_on: str | None = None,
+        **kwargs,
     ):
         super().__init__(*children, **kwargs)
         self.break_on = break_on
 
     def prune(
-            self,
-            budget: int,
-            token_map: TokenMap,
-            encoding_func: EncodingFunc,
-            decoding_func: DecodingFunc,
+        self,
+        budget: int,
+        token_map: TokenMap,
+        encoding_func: EncodingFunc,
+        decoding_func: DecodingFunc,
     ) -> TokenMap | None:
         token_count = self.get_token_count(token_map)
         if token_count <= budget:

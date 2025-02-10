@@ -3,8 +3,15 @@ from __future__ import annotations
 from sys import maxsize
 from typing import Generator, TypeVar, Union
 
-from .utils import EncodingFunc, DecodingFunc, RenderMap, TokenMap, is_in_token_map, update_token_map, \
-    orphan_child_from_token_map
+from .utils import (
+    EncodingFunc,
+    DecodingFunc,
+    RenderMap,
+    TokenMap,
+    is_in_token_map,
+    update_token_map,
+    orphan_child_from_token_map,
+)
 
 __all__ = ("PromptElement",)
 
@@ -12,12 +19,27 @@ M = TypeVar("M", bound=Union[TokenMap, RenderMap])
 
 
 class PromptElement:
+    """
+    Core class for building hierarchical prompt structures with priority-based token management.
+
+    Key features:
+    - Nested prompt structures
+    - Priority-based pruning
+    - Token reservation
+    - Template variable substitution
+
+    Interacts with:
+    - TextChunk: For breaking text on specific characters
+    - Message types: For OpenAI message formatting
+    - History: For conversation history management
+    """
+
     def __init__(
-            self,
-            *children: PromptElement | str,
-            priority: int = maxsize,
-            pass_priority: bool = False,
-            reserve: int | float | None = None,
+        self,
+        *children: PromptElement | str,
+        priority: int = maxsize,
+        pass_priority: bool = False,
+        reserve: int | float | None = None,
     ):
         self.children = children
         self.priority = priority
@@ -67,7 +89,9 @@ class PromptElement:
                 if isinstance(child, PromptElement):
                     if child.pass_priority:
                         for priority_chain, descendant_indices in child.priorities:
-                            descendants.append((priority_chain, [idx] + descendant_indices))
+                            descendants.append(
+                                (priority_chain, [idx] + descendant_indices)
+                            )
                     else:
                         descendants.append((child.priority_chain, [idx]))
                 else:
@@ -127,11 +151,15 @@ class PromptElement:
             child = self.children[idx]
             if isinstance(child, PromptElement):
                 if not isinstance(token_value, dict):
-                    raise TypeError(f"Type mismatch: child = {type(child)}, token_value = {type(token_value)}")
+                    raise TypeError(
+                        f"Type mismatch: child = {type(child)}, token_value = {type(token_value)}"
+                    )
                 token_count += child.get_token_count(token_value)
             else:
                 if not isinstance(token_value, list):
-                    raise TypeError(f"Type mismatch: child = {type(child)}, token_value = {type(token_value)}")
+                    raise TypeError(
+                        f"Type mismatch: child = {type(child)}, token_value = {type(token_value)}"
+                    )
                 token_count += len(token_value)
         return token_count
 
@@ -150,11 +178,11 @@ class PromptElement:
             return child.get_child(descendant_indices[1:])
 
     def prune(
-            self,
-            budget: int,
-            token_map: TokenMap,
-            encoding_func: EncodingFunc,
-            decoding_func: DecodingFunc,
+        self,
+        budget: int,
+        token_map: TokenMap,
+        encoding_func: EncodingFunc,
+        decoding_func: DecodingFunc,
     ) -> TokenMap | None:
         token_count = self.get_token_count(token_map)
         if token_count <= budget:
@@ -166,16 +194,22 @@ class PromptElement:
 
             child = self.get_child(descendant_indices)
             if isinstance(child, PromptElement):
-                token_map, child_token_map = orphan_child_from_token_map(token_map, descendant_indices)
+                token_map, child_token_map = orphan_child_from_token_map(
+                    token_map, descendant_indices
+                )
                 if child.get_token_count(child_token_map) <= child.get_reserved(budget):
-                    token_map = update_token_map(token_map, descendant_indices, child_token_map)
+                    token_map = update_token_map(
+                        token_map, descendant_indices, child_token_map
+                    )
                     continue
 
                 child_budget = budget - self.get_token_count(token_map)
                 if child_budget <= 0:
                     value = None
                 else:
-                    value = child.prune(child_budget, child_token_map, encoding_func, decoding_func)
+                    value = child.prune(
+                        child_budget, child_token_map, encoding_func, decoding_func
+                    )
                 token_map = update_token_map(token_map, descendant_indices, value)
             else:
                 token_map = update_token_map(token_map, descendant_indices, None)
