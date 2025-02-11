@@ -11,7 +11,6 @@ __all__ = (
     "update_token_map",
     "create_render_map",
     "is_in_token_map",
-    "iter_render_map",
 )
 
 RenderMap = dict[int, Union[str, 'RenderMap']]
@@ -88,11 +87,3 @@ def create_render_map(token_map: TokenMap, decoder: Callable[[list[int]], str]) 
         else:
             raise TypeError(f"Unsupported value type: {type(value)}")
     return render_map
-
-
-def iter_render_map(render_map: RenderMap) -> Generator[str, None, None]:
-    for _, value in render_map.items():
-        if isinstance(value, str):
-            yield value
-        else:
-            yield from iter_render_map(value)
