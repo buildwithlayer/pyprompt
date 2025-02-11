@@ -1,6 +1,7 @@
 from sys import maxsize
 
-from .messages import Message
+from .chunk import Chunk
+from .messages import AssistantMessage, Message, ToolMessage, ToolCall
 from .prompt_element import PromptElement
 
 __all__ = ("History",)
@@ -28,7 +29,25 @@ class History(PromptElement):
         step_priority: int | None = None,
         **kwargs,
     ):
-        super().__init__(*children, **kwargs)
+        final_children = []
+        current_chunk = []
+        for child in children:
+            if isinstance(child, ToolMessage) and len(current_chunk) > 0:
+                current_chunk.append(child)
+            else:
+                if len(current_chunk) > 0:
+                    chunk = Chunk(*current_chunk)
+                    final_children.append(chunk)
+                    current_chunk = []
+                if isinstance(child, AssistantMessage) and child.has_tool_calls:
+                    current_chunk.append(child)
+                else:
+                    final_children.append(child)
+        if len(current_chunk) > 0:
+            chunk = Chunk(*current_chunk)
+            final_children.append(chunk)
+
+        super().__init__(*final_children, **kwargs)
 
         if oldest_priority is None and step_priority is None:
             oldest_priority = 0

@@ -109,6 +109,10 @@ class AssistantMessage(Message):
                 message["tool_calls"].append(value.__dict__)
         yield message
 
+    @property
+    def has_tool_calls(self) -> bool:
+        return any(isinstance(child, ToolCall) for child in self.children)
+
 
 class SystemMessage(Message):
     def __init__(self, *children: PromptElement | str, **kwargs):
