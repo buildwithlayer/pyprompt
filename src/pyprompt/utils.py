@@ -1,4 +1,4 @@
-from typing import Callable, Union, Generator, Any
+from typing import Any, Callable, Union
 
 __all__ = (
     "RenderMap",
@@ -13,28 +13,39 @@ __all__ = (
     "is_in_token_map",
 )
 
-RenderMap = dict[int, Union[str, 'RenderMap']]
-TokenMap = dict[int, Union[list[int], 'TokenMap']]
-BudgetMap = dict[int, Union[int | float, 'BudgetMap']]
+RenderMap = dict[int, Union[str, "RenderMap"]]
+TokenMap = dict[int, Union[list[int], "TokenMap"]]
+BudgetMap = dict[int, Union[int | float, "BudgetMap"]]
 EncodingFunc = Callable[[str], list[int]]
 DecodingFunc = Callable[[list[int]], str]
-GrowCallback = Callable[["PromptElement", EncodingFunc, DecodingFunc, Any | None], tuple[TokenMap | None, Any | None]]
+GrowCallback = Callable[
+    ["PromptElement", EncodingFunc, DecodingFunc, Any | None],
+    tuple[TokenMap | None, Any | None],
+]
 
 
-def orphan_child_from_token_map(token_map: TokenMap, descendant_indices: list[int]) -> tuple[TokenMap, TokenMap | list[int]]:
+def orphan_child_from_token_map(
+    token_map: TokenMap, descendant_indices: list[int]
+) -> tuple[TokenMap, TokenMap | list[int]]:
     if len(descendant_indices) == 1:
         parent_token_map = token_map
         child_token_map = token_map.pop(descendant_indices[0])
         return parent_token_map, child_token_map
 
     sub_token_map = token_map.pop(descendant_indices[0])
-    sub_parent_token_map, sub_child_token_map = orphan_child_from_token_map(sub_token_map, descendant_indices[1:])
+    sub_parent_token_map, sub_child_token_map = orphan_child_from_token_map(
+        sub_token_map, descendant_indices[1:]
+    )
     if len(sub_parent_token_map) > 0:
         token_map[descendant_indices[0]] = sub_parent_token_map
     return token_map, sub_child_token_map
 
 
-def update_token_map(token_map: TokenMap, descendant_indices: list[int], value: TokenMap | list[int] | None) -> TokenMap:
+def update_token_map(
+    token_map: TokenMap,
+    descendant_indices: list[int],
+    value: TokenMap | list[int] | None,
+) -> TokenMap:
     if value is None:
         return prune_from_token_map(token_map, descendant_indices)
 
@@ -44,18 +55,24 @@ def update_token_map(token_map: TokenMap, descendant_indices: list[int], value: 
 
     if descendant_indices[0] not in token_map:
         token_map[descendant_indices[0]] = dict()
-    token_map[descendant_indices[0]] = update_token_map(token_map[descendant_indices[0]], descendant_indices[1:], value)
+    token_map[descendant_indices[0]] = update_token_map(
+        token_map[descendant_indices[0]], descendant_indices[1:], value
+    )
     return token_map
 
 
-def prune_from_token_map(token_map: TokenMap, descendant_indices: list[int]) -> TokenMap | None:
+def prune_from_token_map(
+    token_map: TokenMap, descendant_indices: list[int]
+) -> TokenMap | None:
     if len(descendant_indices) == 1:
         token_map.pop(descendant_indices[0], None)
         if len(token_map) == 0:
             return None
         return token_map
 
-    child_token_map = prune_from_token_map(token_map[descendant_indices[0]], descendant_indices[1:])
+    child_token_map = prune_from_token_map(
+        token_map[descendant_indices[0]], descendant_indices[1:]
+    )
     if child_token_map is None:
         token_map.pop(descendant_indices[0], None)
         if len(token_map) == 0:
@@ -74,7 +91,9 @@ def is_in_token_map(descendants: list[int], token_map: TokenMap) -> bool:
     return True
 
 
-def create_render_map(token_map: TokenMap, decoder: Callable[[list[int]], str]) -> RenderMap:
+def create_render_map(
+    token_map: TokenMap, decoder: Callable[[list[int]], str]
+) -> RenderMap:
     render_map = dict()
     for key, value in token_map.items():
         if isinstance(value, list):

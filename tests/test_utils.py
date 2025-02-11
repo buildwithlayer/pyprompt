@@ -23,8 +23,8 @@ def sample_token_map() -> TokenMap:
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
 
@@ -47,8 +47,8 @@ def test_orphan_child_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
     assert child_map == [0]
 
@@ -67,8 +67,8 @@ def test_orphan_child_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
     assert child_map == [4]
 
@@ -86,8 +86,8 @@ def test_orphan_child_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
     assert child_map == [6, 7, 8]
 
@@ -101,7 +101,7 @@ def test_orphan_child_from_token_map(sample_token_map: TokenMap):
                 1: [10, 11, 12],
             },
             3: [13],
-        }
+        },
     }
     assert child_map == {
         0: [14, 15, 16],
@@ -118,7 +118,7 @@ def test_update_token_map():
                 1: [10, 11, 12],
             },
             3: [13],
-        }
+        },
     }
 
     descendant_indices = [3, 4, 0]
@@ -139,8 +139,8 @@ def test_update_token_map():
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
     descendant_indices = [3, 1]
@@ -160,8 +160,8 @@ def test_update_token_map():
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
     descendant_indices = [2, 0]
@@ -184,8 +184,8 @@ def test_update_token_map():
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
     descendant_indices = [0]
@@ -209,8 +209,8 @@ def test_update_token_map():
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
 
@@ -233,8 +233,8 @@ def test_prune_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
     token_map = update_token_map(token_map, [1], None)
@@ -254,8 +254,8 @@ def test_prune_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
-        }
+            },
+        },
     }
 
     token_map = update_token_map(token_map, [2, 0], None)
@@ -272,7 +272,7 @@ def test_prune_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
+            },
         }
     }
 
@@ -289,7 +289,7 @@ def test_prune_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
+            },
         }
     }
 
@@ -305,7 +305,7 @@ def test_prune_from_token_map(sample_token_map: TokenMap):
                 0: {
                     0: [14, 15, 16],
                 }
-            }
+            },
         }
     }
 

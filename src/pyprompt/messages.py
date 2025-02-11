@@ -2,17 +2,24 @@ import json
 from typing import Generator
 
 from .prompt_element import PromptElement
-from .utils import RenderMap, TokenMap, EncodingFunc, DecodingFunc
+from .utils import DecodingFunc, EncodingFunc, RenderMap, TokenMap
 
-__all__ = ("Message", "AssistantMessage", "SystemMessage", "ToolCall", "ToolMessage", "UserMessage")
+__all__ = (
+    "Message",
+    "AssistantMessage",
+    "SystemMessage",
+    "ToolCall",
+    "ToolMessage",
+    "UserMessage",
+)
 
 
 class Message(PromptElement):
     def __init__(
-            self,
-            *children: PromptElement | str,
-            role: str = "",
-            **kwargs,
+        self,
+        *children: PromptElement | str,
+        role: str = "",
+        **kwargs,
     ):
         super().__init__(*children, **kwargs)
 
@@ -35,7 +42,9 @@ class Message(PromptElement):
 
 
 class ToolCall(PromptElement):
-    def __init__(self, id: str, type: str, function_name: str, function_arguments: str, **kwargs):
+    def __init__(
+        self, id: str, type: str, function_name: str, function_arguments: str, **kwargs
+    ):
         super().__init__(id, type, function_name, function_arguments, **kwargs)
         self.id = id
         self.type = type
@@ -50,7 +59,7 @@ class ToolCall(PromptElement):
             "function": {
                 "name": self.function_name,
                 "arguments": self.function_arguments,
-            }
+            },
         }
 
     def get_token_map(self, props: dict, encoding_func: EncodingFunc) -> TokenMap:
@@ -60,15 +69,17 @@ class ToolCall(PromptElement):
         return sum(len(v) for v in token_map.values())
 
     def prune(
-            self,
-            budget: int,
-            token_map: TokenMap,
-            encoding_func: EncodingFunc,
-            decoding_func: DecodingFunc,
+        self,
+        budget: int,
+        token_map: TokenMap,
+        encoding_func: EncodingFunc,
+        decoding_func: DecodingFunc,
     ) -> TokenMap | None:
         return None
 
-    def iter_render_map(self, render_map: RenderMap) -> Generator[str | PromptElement, None, None]:
+    def iter_render_map(
+        self, render_map: RenderMap
+    ) -> Generator[str | PromptElement, None, None]:
         yield self
 
 
@@ -78,9 +89,7 @@ class AssistantMessage(Message):
 
     def get_token_count(self, token_map: TokenMap) -> int:
         token_count = super().get_token_count(token_map)
-        if any(
-                isinstance(child, str) for child in self.children
-        ) and any(
+        if any(isinstance(child, str) for child in self.children) and any(
             isinstance(child, ToolCall) for child in self.children
         ):
             token_count += 2

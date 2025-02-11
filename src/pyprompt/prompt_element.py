@@ -1,18 +1,11 @@
 from __future__ import annotations
 
 from sys import maxsize
-from typing import Generator, Callable, Any
+from typing import Any, Generator
 
-from .utils import (
-    EncodingFunc,
-    DecodingFunc,
-    GrowCallback,
-    RenderMap,
-    TokenMap,
-    is_in_token_map,
-    update_token_map,
-    orphan_child_from_token_map,
-)
+from .utils import (DecodingFunc, EncodingFunc, GrowCallback, RenderMap,
+                    TokenMap, is_in_token_map, orphan_child_from_token_map,
+                    update_token_map)
 
 __all__ = ("PromptElement",)
 
@@ -290,7 +283,9 @@ class PromptElement:
 
         return token_map, None
 
-    def iter_render_map(self, render_map: RenderMap) -> Generator[str | PromptElement, None, None]:
+    def iter_render_map(
+        self, render_map: RenderMap
+    ) -> Generator[str | PromptElement, None, None]:
         for idx, value in render_map.items():
             child = self.children[idx]
             if isinstance(value, str):

@@ -1,5 +1,5 @@
 from .prompt_element import PromptElement
-from .utils import EncodingFunc, DecodingFunc, TokenMap, update_token_map
+from .utils import DecodingFunc, EncodingFunc, TokenMap, update_token_map
 
 __all__ = ("TextChunk",)
 
