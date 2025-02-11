@@ -1,4 +1,5 @@
 # PyPrompt
+![Tests](https://github.com/buildwithlayer/pyprompt/actions/workflows/tests.yml/badge.svg)
 
 ## Installation
 
