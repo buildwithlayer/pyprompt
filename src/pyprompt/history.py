@@ -3,6 +3,8 @@ from sys import maxsize
 from .messages import Message
 from .prompt_element import PromptElement
 
+__all__ = ("History",)
+
 
 class History(PromptElement):
     """

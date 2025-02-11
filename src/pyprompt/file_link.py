@@ -8,9 +8,9 @@ __all__ = ("FileLink",)
 
 class FileLink(TextChunk):
     def __init__(
-            self,
-            *children: str | Path,
-            **kwargs,
+        self,
+        *children: str | Path,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         _children = []

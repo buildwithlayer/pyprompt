@@ -1,4 +1,5 @@
-from conftest import encode, decode
+from conftest import decode, encode
+
 from pyprompt import *
 
 

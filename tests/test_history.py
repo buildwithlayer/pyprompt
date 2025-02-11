@@ -1,3 +1,5 @@
+from sys import maxsize
+
 from pyprompt import *
 
 
@@ -5,7 +7,9 @@ def test_get_child_priority():
     prompt = History(
         UserMessage("Hello!"),
         AssistantMessage("Hello, how can I help you?"),
-        UserMessage("A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"),
+        UserMessage(
+            "A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"
+        ),
         AssistantMessage("{answer}"),
     )
     assert prompt.get_child_priority(0) == 0
@@ -14,7 +18,9 @@ def test_get_child_priority():
     prompt = History(
         UserMessage("Hello!"),
         AssistantMessage("Hello, how can I help you?"),
-        UserMessage("A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"),
+        UserMessage(
+            "A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"
+        ),
         AssistantMessage("{answer}"),
         newest_priority=100,
     )
@@ -26,7 +32,9 @@ def test_get_child_priority():
     prompt = History(
         UserMessage("Hello!"),
         AssistantMessage("Hello, how can I help you?"),
-        UserMessage("A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"),
+        UserMessage(
+            "A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"
+        ),
         AssistantMessage("{answer}"),
         newest_priority=200,
         oldest_priority=100,
@@ -39,7 +47,9 @@ def test_get_child_priority():
     prompt = History(
         UserMessage("Hello!"),
         AssistantMessage("Hello, how can I help you?"),
-        UserMessage("A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"),
+        UserMessage(
+            "A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"
+        ),
         AssistantMessage("{answer}"),
         newest_priority=200,
         step_priority=50,
@@ -52,7 +62,9 @@ def test_get_child_priority():
     prompt = History(
         UserMessage("Hello!"),
         AssistantMessage("Hello, how can I help you?"),
-        UserMessage("A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"),
+        UserMessage(
+            "A runaway trolley car is careening down a track. Five people stand in its path, unaware of the imminent threat. You stand at the intersection of two different tracks and could, if you chose to, divert the trolley onto another track where only one person would be killed. Do you divert the trolley, intentionally killing one to save five?"
+        ),
         AssistantMessage("{answer}"),
         newest_priority=200,
         step_priority=50,
