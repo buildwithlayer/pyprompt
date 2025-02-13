@@ -1,3 +1,4 @@
+from . import PropsDict
 from .prompt_element import PromptElement
 from .utils import DecodingFunc, EncodingFunc, create_render_map
 
@@ -16,6 +17,7 @@ def render_prompt(
     """
     if props is None:
         props = dict()
+    props = PropsDict(props)
 
     reserved_total = prompt.get_reserved(total_budget)
     if reserved_total > total_budget:
