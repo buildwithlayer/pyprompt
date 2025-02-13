@@ -7,7 +7,6 @@ __all__ = (
     "EncodingFunc",
     "DecodingFunc",
     "GrowCallback",
-    "PropsDict",
     "orphan_child_from_token_map",
     "update_token_map",
     "create_render_map",
@@ -23,11 +22,6 @@ GrowCallback = Callable[
     ["PromptElement", EncodingFunc, DecodingFunc, Any | None],
     tuple[TokenMap | None, Any | None],
 ]
-
-
-class PropsDict(dict):
-    def __missing__(self, key: str):
-        return key.join("{}")
 
 
 def orphan_child_from_token_map(

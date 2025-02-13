@@ -23,7 +23,7 @@ class FileLink(TextChunk):
                 raise TypeError(f"Children must be a Path or str, not {type(child)}")
         self.children = tuple(_children)
 
-    def get_token_map(self, props: dict, encoding_func: EncodingFunc) -> TokenMap:
+    def get_token_map(self, encoding_func: EncodingFunc) -> TokenMap:
         token_map = dict()
         for idx, child in enumerate(self.children):
             with open(child, "r") as f:

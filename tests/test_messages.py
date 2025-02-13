@@ -38,7 +38,7 @@ def test_tool_call_dict():
 
 def test_tool_call_get_token_map():
     tool_call = ToolCall("some-id", "function", "ReallyCoolFunction", "{}")
-    assert tool_call.get_token_map(dict(), encode) == {
+    assert tool_call.get_token_map(encode) == {
         0: [
             5018,
             307,

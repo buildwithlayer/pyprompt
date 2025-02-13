@@ -62,7 +62,7 @@ class ToolCall(PromptElement):
             },
         }
 
-    def get_token_map(self, props: dict, encoding_func: EncodingFunc) -> TokenMap:
+    def get_token_map(self, encoding_func: EncodingFunc) -> TokenMap:
         return {0: encoding_func(json.dumps(self.__dict__))}
 
     def get_token_count(self, token_map: TokenMap) -> int:

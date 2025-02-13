@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyprompt"
-version = "0.3.3"
+version = "0.3.5"
 description = "Validation for LLM prompts."
 authors = [
   "Andrew Hamilton <andrewh@buildwithlayer.com>",

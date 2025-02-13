@@ -99,19 +99,18 @@ class PromptElement:
             self._priorities = descendants
         return self._priorities
 
-    def get_token_map(self, props: dict, encoding_func: EncodingFunc) -> TokenMap:
+    def get_token_map(self, encoding_func: EncodingFunc) -> TokenMap:
         """
-        Creates a token map from the given props.
-        :param props: a dict of variables to be substituted into strings of the render map.
+        Creates a token map for the given element.
         :param encoding_func: A function that takes a string and returns the list of tokens.
         :return: TokenMap
         """
         token_map = dict()
         for idx, child in enumerate(self.children):
             if isinstance(child, PromptElement):
-                token_map[idx] = child.get_token_map(props, encoding_func)
+                token_map[idx] = child.get_token_map(encoding_func)
             elif isinstance(child, str):
-                token_map[idx] = encoding_func(child.format_map(props))
+                token_map[idx] = encoding_func(child)
             else:
                 raise TypeError(f"Unsupported child type: {type(child)}")
         return token_map

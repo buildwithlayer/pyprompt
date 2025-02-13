@@ -7,7 +7,7 @@ from pyprompt import *
 
 def test_priority_chain():
     prompt = PromptElement(
-        PromptElement("It is {temperature} degrees today.", pass_priority=True),
+        PromptElement("It is 27 degrees today.", pass_priority=True),
         "Thank you!",
         priority=200,
     )
@@ -15,9 +15,9 @@ def test_priority_chain():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100),
+        PromptElement("How are you, Bob?", priority=100),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", pass_priority=True),
+            PromptElement("It is 27 degrees today.", pass_priority=True),
             "Thank you!",
             priority=200,
         ),
@@ -26,9 +26,9 @@ def test_priority_chain():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100),
+        PromptElement("How are you, Bob?", priority=100),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", pass_priority=True),
+            PromptElement("It is 27 degrees today.", pass_priority=True),
             "Thank you!",
             priority=200,
         ),
@@ -48,7 +48,7 @@ def test_priority_chain():
 
 def test_priorities():
     prompt = PromptElement(
-        PromptElement("It is {temperature} degrees today.", pass_priority=True),
+        PromptElement("It is 27 degrees today.", pass_priority=True),
         "Thank you!",
         priority=200,
     )
@@ -59,9 +59,9 @@ def test_priorities():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100),
+        PromptElement("How are you, Bob?", priority=100),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", pass_priority=True),
+            PromptElement("It is 27 degrees today.", pass_priority=True),
             "Thank you!",
             priority=200,
         ),
@@ -74,9 +74,9 @@ def test_priorities():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100),
+        PromptElement("How are you, Bob?", priority=100),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", pass_priority=True),
+            PromptElement("It is 27 degrees today.", pass_priority=True),
             "Thank you!",
             priority=200,
         ),
@@ -100,9 +100,9 @@ def test_priorities():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100, reserve=6),
+        PromptElement("How are you, Bob?", priority=100, reserve=6),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", priority=200),
+            PromptElement("It is 27 degrees today.", priority=200),
             "Thank you!",
             pass_priority=True,
         ),
@@ -118,17 +118,13 @@ def test_priorities():
 def test_get_token_map():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?"),
+        PromptElement(f"How are you, Bob?"),
         PromptElement(
-            PromptElement("It is {temperature} degrees today."),
+            PromptElement(f"It is 27 degrees today."),
             "Thank you!",
         ),
     )
-    props = {
-        "name": "Bob",
-        "temperature": 27,
-    }
-    assert prompt.get_token_map(props, encode) == {
+    assert prompt.get_token_map(encode) == {
         0: [9906, 0],
         1: {
             0: [4438, 527, 499, 11, 14596, 30],
@@ -145,9 +141,9 @@ def test_get_token_map():
 def test_get_reserved():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?"),
+        PromptElement("How are you, Bob?"),
         PromptElement(
-            PromptElement("It is {temperature} degrees today."),
+            PromptElement("It is 27 degrees today."),
             "Thank you!",
         ),
     )
@@ -156,9 +152,9 @@ def test_get_reserved():
 
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", reserve=10),
+        PromptElement("How are you, Bob?", reserve=10),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", reserve=1 / 5),
+            PromptElement("It is 27 degrees today.", reserve=1 / 5),
             "Thank you!",
         ),
     )
@@ -169,9 +165,9 @@ def test_get_reserved():
 def test_get_token_count():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?"),
+        PromptElement("How are you, Bob?"),
         PromptElement(
-            PromptElement("It is {temperature} degrees today."),
+            PromptElement("It is 27 degrees today."),
             "Thank you!",
         ),
     )
@@ -193,9 +189,9 @@ def test_get_token_count():
 def test_prune_no_priority():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?"),
+        PromptElement("How are you, Bob?"),
         PromptElement(
-            PromptElement("It is {temperature} degrees today."),
+            PromptElement("It is 27 degrees today."),
             "Thank you!",
         ),
     )
@@ -253,9 +249,9 @@ def test_prune_no_priority():
 def test_prune_with_priority():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100),
+        PromptElement("How are you, Bob?", priority=100),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", priority=200),
+            PromptElement("It is 27 degrees today.", priority=200),
             "Thank you!",
             pass_priority=True,
         ),
@@ -307,9 +303,9 @@ def test_prune_with_priority():
 def test_prune_with_reserve():
     prompt = PromptElement(
         "Hello!",
-        PromptElement("How are you, {name}?", priority=100, reserve=6),
+        PromptElement("How are you, Bob?", priority=100, reserve=6),
         PromptElement(
-            PromptElement("It is {temperature} degrees today.", priority=200),
+            PromptElement("It is 27 degrees today.", priority=200),
             "Thank you!",
             pass_priority=True,
         ),
@@ -386,7 +382,7 @@ def test_grow():
     )
     token_map, final_grow_state = prompt.grow(
         20,
-        prompt.get_token_map(dict(), encoding_func=encode),
+        prompt.get_token_map(encoding_func=encode),
         encode,
         decode,
     )
